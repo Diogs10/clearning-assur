@@ -29,9 +29,6 @@ public class UserController {
 
     private final UserService userService;
 
-    /**
-     * POST /api/users - Créer un utilisateur
-     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Créer un utilisateur", description = "Crée un nouvel utilisateur dans le système")
@@ -41,9 +38,6 @@ public class UserController {
         return ResponseUtil.created(user, "Utilisateur créé avec succès");
     }
 
-    /**
-     * POST /api/users/get-username - Récupérer les infos d'un utilisateur par username
-     */
     @PostMapping("/get-username")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Récupérer un utilisateur", description = "Récupère les informations d'un utilisateur par son username")
@@ -53,9 +47,6 @@ public class UserController {
         return ResponseUtil.success(user);
     }
 
-    /**
-     * GET /api/users?max=10&offset=0 - Lister les utilisateurs
-     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lister les utilisateurs", description = "Récupère la liste paginée des utilisateurs")
@@ -66,9 +57,6 @@ public class UserController {
         return ResponseUtil.successPaginated(users, "Liste des utilisateurs récupérée avec succès");
     }
 
-    /**
-     * GET /api/users/{id} - Récupérer un utilisateur par ID
-     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Récupérer un utilisateur par ID", description = "Récupère les détails d'un utilisateur")
@@ -77,9 +65,6 @@ public class UserController {
         return ResponseUtil.success(user);
     }
 
-    /**
-     * PUT /api/users/{id} - Mettre à jour un utilisateur
-     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Mettre à jour un utilisateur", description = "Met à jour les informations d'un utilisateur")
@@ -90,9 +75,6 @@ public class UserController {
         return ResponseUtil.success(user, "Utilisateur mis à jour avec succès");
     }
 
-    /**
-     * DELETE /api/users/{id} - Supprimer un utilisateur
-     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Supprimer un utilisateur", description = "Supprime un utilisateur du système")
@@ -101,9 +83,6 @@ public class UserController {
         return ResponseUtil.success(null, "Utilisateur supprimé avec succès");
     }
 
-    /**
-     * POST /api/users/{id}/change-password - Changer le mot de passe
-     */
     @PostMapping("/{id}/change-password")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Changer le mot de passe", description = "Change le mot de passe d'un utilisateur")
@@ -114,9 +93,6 @@ public class UserController {
         return ResponseUtil.success(null, "Mot de passe changé avec succès");
     }
 
-    /**
-     * POST /api/users/{id}/assign-roles - Assigner des rôles à un utilisateur
-     */
     @PostMapping("/{id}/assign-roles")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Assigner des rôles", description = "Assigne des rôles à un utilisateur")

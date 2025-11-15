@@ -16,9 +16,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 
-/**
- * Configuration Swagger/OpenAPI avec authentification Keycloak
- */
 @Configuration
 public class SwaggerConfig {
 

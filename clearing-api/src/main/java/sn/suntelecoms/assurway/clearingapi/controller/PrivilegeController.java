@@ -29,9 +29,6 @@ class PrivilegeController {
 
     private final PrivilegeService privilegeService;
 
-    /**
-     * GET /api/privileges?max=10&offset=0&sort=ordre&order=asc - Lister les privilèges paginés
-     */
     @GetMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Lister les privilèges paginés", description = "Récupère la liste paginée des privilèges")
@@ -44,9 +41,6 @@ class PrivilegeController {
         return ResponseUtil.successPaginated(privileges, "Liste des privilèges récupérée avec succès");
     }
 
-    /**
-     * GET /api/privileges/liste-privileges - Lister tous les privilèges (hiérarchique)
-     */
     @GetMapping("/liste-privileges")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Lister tous les privilèges (hiérarchique)", description = "Récupère tous les privilèges avec leur hiérarchie parent-enfant")
@@ -55,9 +49,6 @@ class PrivilegeController {
         return ResponseUtil.success(privileges);
     }
 
-    /**
-     * POST /api/privileges - Créer un privilège
-     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Créer un privilège", description = "Crée un nouveau privilège")
@@ -67,9 +58,6 @@ class PrivilegeController {
         return ResponseUtil.created(privilege, "Privilège créé avec succès");
     }
 
-    /**
-     * GET /api/privileges/{id} - Récupérer un privilège par ID
-     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Récupérer un privilège", description = "Récupère les détails d'un privilège")
@@ -78,9 +66,6 @@ class PrivilegeController {
         return ResponseUtil.success(privilege);
     }
 
-    /**
-     * PUT /api/privileges/{id} - Mettre à jour un privilège
-     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Mettre à jour un privilège", description = "Met à jour les informations d'un privilège")
@@ -91,9 +76,6 @@ class PrivilegeController {
         return ResponseUtil.success(privilege, "Privilège mis à jour avec succès");
     }
 
-    /**
-     * DELETE /api/privileges/{id} - Supprimer un privilège
-     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Supprimer un privilège", description = "Supprime un privilège du système")

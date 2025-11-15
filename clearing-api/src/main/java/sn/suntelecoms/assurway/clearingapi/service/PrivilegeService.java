@@ -27,9 +27,6 @@ public class PrivilegeService {
 
     private final PrivilegeRepository privilegeRepository;
 
-    /**
-     * Créer un nouveau privilège
-     */
     @Transactional
     public PrivilegeDTO.PrivilegeResponse createPrivilege(PrivilegeDTO.CreatePrivilegeRequest request) {
 
@@ -57,9 +54,6 @@ public class PrivilegeService {
         return mapToPrivilegeResponse(savedPrivilege);
     }
 
-    /**
-     * Lister tous les privilèges avec pagination
-     */
     public Page<PrivilegeDTO.PrivilegeResponse> getAllPrivileges(int max, int offset, String sort, String order) {
 
         Sort sortBy = order.equalsIgnoreCase("desc") 
@@ -72,9 +66,6 @@ public class PrivilegeService {
         return privileges.map(this::mapToPrivilegeResponse);
     }
 
-    /**
-     * Lister tous les privilèges avec hiérarchie
-     */
     public List<PrivilegeDTO.PrivilegeResponse> getAllPrivilegesHierarchical() {
         List<Privilege> rootPrivileges = privilegeRepository.findByParentIdIsNull();
         
@@ -83,18 +74,12 @@ public class PrivilegeService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Récupérer un privilège par ID
-     */
     public PrivilegeDTO.PrivilegeResponse getPrivilegeById(UUID id) {
         Privilege privilege = privilegeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Privilège", "id", id));
         return mapToPrivilegeResponseWithChildren(privilege);
     }
 
-    /**
-     * Mettre à jour un privilège
-     */
     @Transactional
     public PrivilegeDTO.PrivilegeResponse updatePrivilege(UUID id, PrivilegeDTO.UpdatePrivilegeRequest request) {
 
@@ -112,9 +97,6 @@ public class PrivilegeService {
         return mapToPrivilegeResponse(updatedPrivilege);
     }
 
-    /**
-     * Supprimer un privilège
-     */
     @Transactional
     public void deletePrivilege(UUID id) {
         Privilege privilege = privilegeRepository.findById(id)
@@ -127,9 +109,6 @@ public class PrivilegeService {
         privilegeRepository.deleteById(id);
     }
 
-    /**
-     * Récupérer tous les privilèges de type menu
-     */
     public List<PrivilegeDTO.PrivilegeResponse> getMenuPrivileges() {
         List<Privilege> menuPrivileges = privilegeRepository.findAllMenuItems();
         return menuPrivileges.stream()

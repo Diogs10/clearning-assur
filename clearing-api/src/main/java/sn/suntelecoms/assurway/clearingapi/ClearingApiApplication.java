@@ -13,9 +13,6 @@ public class ClearingApiApplication {
         SpringApplication.run(ClearingApiApplication.class, args);
     }
 
-    /**
-     * Configuration CORS pour le frontend Angular
-     */
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

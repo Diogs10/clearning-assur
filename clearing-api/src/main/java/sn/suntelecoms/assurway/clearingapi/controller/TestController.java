@@ -14,18 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Contrôleur de test pour vérifier l'authentification Keycloak
- */
 @Slf4j
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Test", description = "Endpoints de test de l'authentification")
 public class TestController {
 
-    /**
-     * Endpoint public - accessible sans authentification
-     */
     @GetMapping("/public/hello")
     @Operation(summary = "Endpoint public", description = "Accessible sans authentification")
     public Map<String, String> publicEndpoint() {
@@ -35,9 +29,6 @@ public class TestController {
         return response;
     }
 
-    /**
-     * Endpoint protégé - nécessite une authentification
-     */
     @GetMapping("/user/profile")
     @Operation(
         summary = "Profil utilisateur", 
@@ -59,9 +50,6 @@ public class TestController {
         return response;
     }
 
-    /**
-     * Endpoint admin - nécessite le rôle ADMIN
-     */
     @GetMapping("/admin/dashboard")
     @Operation(
         summary = "Dashboard admin", 
@@ -79,9 +67,6 @@ public class TestController {
         return response;
     }
 
-    /**
-     * Endpoint pour obtenir les détails du token JWT
-     */
     @GetMapping("/user/token-info")
     @Operation(
         summary = "Informations du token", 

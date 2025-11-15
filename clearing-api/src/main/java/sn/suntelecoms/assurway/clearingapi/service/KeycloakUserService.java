@@ -16,9 +16,6 @@ import jakarta.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Service pour gérer les utilisateurs dans Keycloak
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,9 +26,6 @@ public class KeycloakUserService {
     @Value("${keycloak.realm}")
     private String realm;
 
-    /**
-     * Créer un nouvel utilisateur dans Keycloak
-     */
     public String createUser(String username, String email, String firstName, 
                            String lastName, String password, String... roles) {
         try {
@@ -64,18 +58,13 @@ public class KeycloakUserService {
 
                 return userId;
             } else {
-                log.error("Échec de la création de l'utilisateur: {}", response.getStatusInfo());
                 throw new RuntimeException("Échec de la création de l'utilisateur: " + response.getStatusInfo());
             }
         } catch (Exception e) {
-            log.error("Erreur lors de la création de l'utilisateur: {}", e.getMessage());
             throw new RuntimeException("Erreur lors de la création de l'utilisateur", e);
         }
     }
 
-    /**
-     * Assigner des rôles à un utilisateur
-     */
     public void assignRoles(String userId, String... roleNames) {
         try {
             RealmResource realmResource = keycloak.realm(realm);
@@ -86,53 +75,37 @@ public class KeycloakUserService {
                 userResource.roles().realmLevel().add(Collections.singletonList(role));
             }
         } catch (Exception e) {
-            log.error("Erreur lors de l'assignation des rôles: {}", e.getMessage());
             throw new RuntimeException("Erreur lors de l'assignation des rôles", e);
         }
     }
 
-    /**
-     * Récupérer tous les utilisateurs
-     */
     public List<UserRepresentation> getAllUsers() {
         try {
             RealmResource realmResource = keycloak.realm(realm);
             return realmResource.users().list();
         } catch (Exception e) {
-            log.error("Erreur lors de la récupération des utilisateurs: {}", e.getMessage());
             throw new RuntimeException("Erreur lors de la récupération des utilisateurs", e);
         }
     }
 
-    /**
-     * Récupérer un utilisateur par son ID
-     */
     public UserRepresentation getUserById(String userId) {
         try {
             RealmResource realmResource = keycloak.realm(realm);
             return realmResource.users().get(userId).toRepresentation();
         } catch (Exception e) {
-            log.error("Erreur lors de la récupération de l'utilisateur: {}", e.getMessage());
             throw new RuntimeException("Erreur lors de la récupération de l'utilisateur", e);
         }
     }
 
-    /**
-     * Supprimer un utilisateur
-     */
     public void deleteUser(String userId) {
         try {
             RealmResource realmResource = keycloak.realm(realm);
             realmResource.users().get(userId).remove();
         } catch (Exception e) {
-            log.error("Erreur lors de la suppression de l'utilisateur: {}", e.getMessage());
             throw new RuntimeException("Erreur lors de la suppression de l'utilisateur", e);
         }
     }
 
-    /**
-     * Mettre à jour un utilisateur
-     */
     public void updateUser(String userId, String email, String firstName, String lastName) {
         try {
             RealmResource realmResource = keycloak.realm(realm);
@@ -145,14 +118,10 @@ public class KeycloakUserService {
 
             userResource.update(user);
         } catch (Exception e) {
-            log.error("Erreur lors de la mise à jour de l'utilisateur: {}", e.getMessage());
             throw new RuntimeException("Erreur lors de la mise à jour de l'utilisateur", e);
         }
     }
 
-    /**
-     * Réinitialiser le mot de passe d'un utilisateur
-     */
     public void resetPassword(String userId, String newPassword) {
         try {
             RealmResource realmResource = keycloak.realm(realm);
@@ -165,7 +134,6 @@ public class KeycloakUserService {
 
             userResource.resetPassword(credential);
         } catch (Exception e) {
-            log.error("Erreur lors de la réinitialisation du mot de passe: {}", e.getMessage());
             throw new RuntimeException("Erreur lors de la réinitialisation du mot de passe", e);
         }
     }

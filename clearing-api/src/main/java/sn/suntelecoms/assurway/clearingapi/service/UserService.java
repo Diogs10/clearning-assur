@@ -32,9 +32,6 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Créer un nouvel utilisateur
-     */
     @Transactional
     public UserDTO.UserResponse createUser(UserDTO.CreateUserRequest request) {
 
@@ -74,36 +71,25 @@ public class UserService {
         return mapToUserResponse(savedUser);
     }
 
-    /**
-     * Récupérer les infos d'un utilisateur par username
-     */
     public UserDTO.UserResponse getUserByUsername(String username) {
         User user = userRepository.findByUsernameWithRoles(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "username", username));
         return mapToUserResponse(user);
     }
 
-    /**
-     * Récupérer un utilisateur par ID
-     */
     public UserDTO.UserResponse getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "id", id));
         return mapToUserResponse(user);
     }
 
-    /**
-     * Lister tous les utilisateurs avec pagination
-     */
     public Page<UserDTO.UserResponse> getAllUsers(int max, int offset) {
         Pageable pageable = PageRequest.of(offset / max, max);
         Page<User> users = userRepository.findAll(pageable);
         return users.map(this::mapToUserResponse);
     }
 
-    /**
-     * Mettre à jour un utilisateur
-     */
+
     @Transactional
     public UserDTO.UserResponse updateUser(UUID id, UserDTO.UpdateUserRequest request) {
         User user = userRepository.findById(id)
@@ -126,9 +112,6 @@ public class UserService {
         return mapToUserResponse(updatedUser);
     }
 
-    /**
-     * Supprimer un utilisateur
-     */
     @Transactional
     public void deleteUser(UUID id) {
         if (!userRepository.existsById(id)) {
@@ -137,9 +120,6 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    /**
-     * Changer le mot de passe
-     */
     @Transactional
     public void changePassword(UUID userId, UserDTO.ChangePasswordRequest request) {
         User user = userRepository.findById(userId)
@@ -154,9 +134,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    /**
-     * Assigner des rôles à un utilisateur
-     */
     @Transactional
     public UserDTO.UserResponse assignRolesToUser(UUID userId, List<String> roleNames) {
         User user = userRepository.findById(userId)

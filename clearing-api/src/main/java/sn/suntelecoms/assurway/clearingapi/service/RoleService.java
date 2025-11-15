@@ -27,9 +27,6 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final PrivilegeRepository privilegeRepository;
 
-    /**
-     * Créer un nouveau rôle
-     */
     @Transactional
     public RoleDTO.RoleResponse createRole(RoleDTO.CreateRoleRequest request) {
 
@@ -46,9 +43,6 @@ public class RoleService {
         return mapToRoleResponse(savedRole);
     }
 
-    /**
-     * Lister tous les rôles
-     */
     public List<RoleDTO.RoleResponse> getAllRoles() {
         List<Role> roles = roleRepository.findAll();
         return roles.stream()
@@ -56,18 +50,12 @@ public class RoleService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Récupérer un rôle par ID avec ses privilèges
-     */
     public RoleDTO.RoleResponse getRoleById(UUID id) {
         Role role = roleRepository.findByIdWithPrivileges(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rôle", "id", id));
         return mapToRoleResponse(role);
     }
 
-    /**
-     * Récupérer les privilèges d'un rôle
-     */
     public Set<PrivilegeDTO.PrivilegeResponse> getRolePrivileges(UUID roleId) {
         Role role = roleRepository.findByIdWithPrivileges(roleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rôle", "id", roleId));
@@ -77,9 +65,6 @@ public class RoleService {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Assigner des privilèges à un rôle
-     */
     @Transactional
     public RoleDTO.RoleResponse assignPrivilegesToRole(String roleAuthority, List<UUID> privilegeIds) {
 
@@ -99,9 +84,6 @@ public class RoleService {
         return mapToRoleResponse(updatedRole);
     }
 
-    /**
-     * Supprimer un rôle
-     */
     @Transactional
     public void deleteRole(UUID id) {
         if (!roleRepository.existsById(id)) {
