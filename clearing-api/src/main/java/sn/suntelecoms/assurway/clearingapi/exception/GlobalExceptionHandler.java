@@ -145,7 +145,6 @@ public class GlobalExceptionHandler {
         log.error("Erreur runtime: {}", ex.getMessage(), ex);
         String message = ex.getMessage();
 
-        // Gestion spécifique selon le message d'erreur
         if (message.contains("existe déjà") || message.contains("duplicate")) {
             return ResponseUtil.conflict(message);
         } else if (message.contains("non trouvé") || message.contains("not found")) {

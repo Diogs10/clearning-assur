@@ -32,13 +32,11 @@ public class PrivilegeService {
      */
     @Transactional
     public PrivilegeDTO.PrivilegeResponse createPrivilege(PrivilegeDTO.CreatePrivilegeRequest request) {
-        log.info("Création d'un privilège: {}", request.getCode());
 
         if (privilegeRepository.existsByCode(request.getCode())) {
             throw new ResourceAlreadyExistsException("Privilège", "code", request.getCode());
         }
 
-        // Vérifier que le parent existe si spécifié
         if (request.getParentId() != null) {
             privilegeRepository.findById(request.getParentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Privilège parent", "id", request.getParentId()));
@@ -55,7 +53,6 @@ public class PrivilegeService {
         privilege.setOrdre(request.getOrdre());
 
         Privilege savedPrivilege = privilegeRepository.save(privilege);
-        log.info("Privilège créé avec succès: {}", savedPrivilege.getCode());
 
         return mapToPrivilegeResponse(savedPrivilege);
     }
@@ -64,7 +61,6 @@ public class PrivilegeService {
      * Lister tous les privilèges avec pagination
      */
     public Page<PrivilegeDTO.PrivilegeResponse> getAllPrivileges(int max, int offset, String sort, String order) {
-        log.info("Récupération des privilèges (max={}, offset={}, sort={}, order={})", max, offset, sort, order);
 
         Sort sortBy = order.equalsIgnoreCase("desc") 
             ? Sort.by(sort).descending() 
@@ -80,7 +76,6 @@ public class PrivilegeService {
      * Lister tous les privilèges avec hiérarchie
      */
     public List<PrivilegeDTO.PrivilegeResponse> getAllPrivilegesHierarchical() {
-        log.info("Récupération de tous les privilèges avec hiérarchie");
         List<Privilege> rootPrivileges = privilegeRepository.findByParentIdIsNull();
         
         return rootPrivileges.stream()
@@ -92,7 +87,6 @@ public class PrivilegeService {
      * Récupérer un privilège par ID
      */
     public PrivilegeDTO.PrivilegeResponse getPrivilegeById(UUID id) {
-        log.info("Récupération du privilège ID: {}", id);
         Privilege privilege = privilegeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Privilège", "id", id));
         return mapToPrivilegeResponseWithChildren(privilege);
@@ -103,7 +97,6 @@ public class PrivilegeService {
      */
     @Transactional
     public PrivilegeDTO.PrivilegeResponse updatePrivilege(UUID id, PrivilegeDTO.UpdatePrivilegeRequest request) {
-        log.info("Mise à jour du privilège ID: {}", id);
 
         Privilege privilege = privilegeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Privilège", "id", id));
@@ -115,7 +108,6 @@ public class PrivilegeService {
         if (request.getOrdre() != null) privilege.setOrdre(request.getOrdre());
 
         Privilege updatedPrivilege = privilegeRepository.save(privilege);
-        log.info("Privilège mis à jour avec succès: {}", updatedPrivilege.getCode());
 
         return mapToPrivilegeResponse(updatedPrivilege);
     }
@@ -125,31 +117,26 @@ public class PrivilegeService {
      */
     @Transactional
     public void deletePrivilege(UUID id) {
-        log.info("Suppression du privilège ID: {}", id);
         Privilege privilege = privilegeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Privilège", "id", id));
 
-        // Vérifier qu'il n'a pas d'enfants
         if (!privilege.getChildren().isEmpty()) {
             throw new BusinessException("Impossible de supprimer un privilège qui a des enfants");
         }
 
         privilegeRepository.deleteById(id);
-        log.info("Privilège supprimé avec succès");
     }
 
     /**
      * Récupérer tous les privilèges de type menu
      */
     public List<PrivilegeDTO.PrivilegeResponse> getMenuPrivileges() {
-        log.info("Récupération des privilèges de type menu");
         List<Privilege> menuPrivileges = privilegeRepository.findAllMenuItems();
         return menuPrivileges.stream()
                 .map(this::mapToPrivilegeResponse)
                 .collect(Collectors.toList());
     }
 
-    // Méthodes utilitaires de mapping
     private PrivilegeDTO.PrivilegeResponse mapToPrivilegeResponse(Privilege privilege) {
         PrivilegeDTO.PrivilegeResponse response = new PrivilegeDTO.PrivilegeResponse();
         response.setId(privilege.getId());

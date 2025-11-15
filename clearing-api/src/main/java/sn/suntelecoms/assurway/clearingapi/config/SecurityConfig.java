@@ -33,7 +33,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints publics (sans authentification)
                         .requestMatchers(
                                 "/api/public/**",
                                 "/api-docs/**",
@@ -44,13 +43,10 @@ public class SecurityConfig {
                                 "/actuator/info"
                         ).permitAll()
                         
-                        // Endpoints admin (rôle ADMIN requis)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         
-                        // Endpoints utilisateur (rôle USER requis)
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
                         
-                        // Tous les autres endpoints nécessitent une authentification
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -69,10 +65,8 @@ public class SecurityConfig {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         
-        // Préfixe pour les rôles (ROLE_USER, ROLE_ADMIN, etc.)
         grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
         
-        // Extraction des rôles depuis le claim "realm_access.roles" de Keycloak
         grantedAuthoritiesConverter.setAuthoritiesClaimName("realm_access.roles");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();

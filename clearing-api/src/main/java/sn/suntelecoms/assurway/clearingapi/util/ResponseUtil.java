@@ -12,7 +12,6 @@ import java.util.List;
 
 public class ResponseUtil {
 
-    // Méthodes pour les réponses de succès
     public static <T> ResponseEntity<ApiResponse<T>> success(T data) {
         return ResponseEntity.ok(ApiResponse.success(data));
     }
@@ -21,7 +20,6 @@ public class ResponseUtil {
         return ResponseEntity.ok(ApiResponse.success(data, message));
     }
 
-    // Méthode spécifique pour les réponses paginées
     public static <T> ResponseEntity<ApiResponse<PaginatedResponse<T>>> successPaginated(Page<T> page) {
         PaginatedResponse<T> paginatedData = new PaginatedResponse<>(
                 page.getContent(),
@@ -60,7 +58,6 @@ public class ResponseUtil {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(data, message));
     }
 
-    // Méthodes pour les réponses d'erreur
     public static ResponseEntity<ApiErrorResponse> badRequest(String message) {
         return ResponseEntity.badRequest().body(ApiErrorResponse.badRequest(message));
     }

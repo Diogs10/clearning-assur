@@ -15,7 +15,6 @@ public class ApiResponse<T> {
     private String status;
     private LocalDateTime timestamp;
 
-    // Constructeur privé
     private ApiResponse(boolean success, String message, T data, int statusCode, String status) {
         this.success = success;
         this.message = message;
@@ -25,7 +24,6 @@ public class ApiResponse<T> {
         this.timestamp = LocalDateTime.now();
     }
 
-    // Méthodes statiques pour les réponses de succès
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(true, "Succès", data, HttpStatus.OK.value(), "OK");
     }
@@ -54,7 +52,6 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, "Aucun contenu", null, HttpStatus.NO_CONTENT.value(), "NO_CONTENT");
     }
 
-    // Getters et Setters
     public boolean isSuccess() { return success; }
     public void setSuccess(boolean success) { this.success = success; }
 

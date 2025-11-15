@@ -56,7 +56,6 @@ public class Privilege {
     @ManyToMany(mappedBy = "privileges")
     private Set<Role> roles = new HashSet<>();
 
-    // Relations parent-enfant
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", insertable = false, updatable = false)
     @JsonIgnore

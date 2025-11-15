@@ -37,7 +37,6 @@ public class UserController {
     @Operation(summary = "Créer un utilisateur", description = "Crée un nouvel utilisateur dans le système")
     public ResponseEntity<ApiResponse<UserDTO.UserResponse>> createUser(
             @Valid @RequestBody UserDTO.CreateUserRequest request) {
-        log.info("API: Création d'un utilisateur");
         UserDTO.UserResponse user = userService.createUser(request);
         return ResponseUtil.created(user, "Utilisateur créé avec succès");
     }
@@ -50,7 +49,6 @@ public class UserController {
     @Operation(summary = "Récupérer un utilisateur", description = "Récupère les informations d'un utilisateur par son username")
     public ResponseEntity<ApiResponse<UserDTO.UserResponse>> getUserByUsername(
             @Valid @RequestBody UserDTO.GetUsernameRequest request) {
-        log.info("API: Récupération de l'utilisateur: {}", request.getUsername());
         UserDTO.UserResponse user = userService.getUserByUsername(request.getUsername());
         return ResponseUtil.success(user);
     }
@@ -64,7 +62,6 @@ public class UserController {
     public ResponseEntity<ApiResponse<PaginatedResponse<UserDTO.UserResponse>>> getAllUsers(
             @RequestParam(defaultValue = "10") int max,
             @RequestParam(defaultValue = "0") int offset) {
-        log.info("API: Liste des utilisateurs (max={}, offset={})", max, offset);
         Page<UserDTO.UserResponse> users = userService.getAllUsers(max, offset);
         return ResponseUtil.successPaginated(users, "Liste des utilisateurs récupérée avec succès");
     }
@@ -76,7 +73,6 @@ public class UserController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Récupérer un utilisateur par ID", description = "Récupère les détails d'un utilisateur")
     public ResponseEntity<ApiResponse<UserDTO.UserResponse>> getUserById(@PathVariable UUID id) {
-        log.info("API: Récupération de l'utilisateur ID: {}", id);
         UserDTO.UserResponse user = userService.getUserById(id);
         return ResponseUtil.success(user);
     }
@@ -90,7 +86,6 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserDTO.UserResponse>> updateUser(
             @PathVariable UUID id,
             @Valid @RequestBody UserDTO.UpdateUserRequest request) {
-        log.info("API: Mise à jour de l'utilisateur ID: {}", id);
         UserDTO.UserResponse user = userService.updateUser(id, request);
         return ResponseUtil.success(user, "Utilisateur mis à jour avec succès");
     }
@@ -102,7 +97,6 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Supprimer un utilisateur", description = "Supprime un utilisateur du système")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable UUID id) {
-        log.info("API: Suppression de l'utilisateur ID: {}", id);
         userService.deleteUser(id);
         return ResponseUtil.success(null, "Utilisateur supprimé avec succès");
     }
@@ -116,7 +110,6 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @PathVariable UUID id,
             @Valid @RequestBody UserDTO.ChangePasswordRequest request) {
-        log.info("API: Changement de mot de passe pour l'utilisateur ID: {}", id);
         userService.changePassword(id, request);
         return ResponseUtil.success(null, "Mot de passe changé avec succès");
     }
@@ -130,7 +123,6 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserDTO.UserResponse>> assignRoles(
             @PathVariable UUID id,
             @RequestBody List<String> roles) {
-        log.info("API: Attribution de rôles à l'utilisateur ID: {}", id);
         UserDTO.UserResponse user = userService.assignRolesToUser(id, roles);
         return ResponseUtil.success(user, "Rôles attribués avec succès");
     }

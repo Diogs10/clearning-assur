@@ -18,7 +18,6 @@ public class ApiErrorResponse {
     private String path;
     private LocalDateTime timestamp;
 
-    // Constructeur privé
     private ApiErrorResponse(boolean success, String message, int statusCode, String status,
                              String error, List<String> details, String path) {
         this.success = success;
@@ -31,7 +30,6 @@ public class ApiErrorResponse {
         this.timestamp = LocalDateTime.now();
     }
 
-    // Méthodes statiques pour les erreurs communes
     public static ApiErrorResponse badRequest(String message) {
         return new ApiErrorResponse(false, message, HttpStatus.BAD_REQUEST.value(),
                 "BAD_REQUEST", "Requête invalide", null, null);
@@ -93,7 +91,6 @@ public class ApiErrorResponse {
                 status.name(), status.getReasonPhrase(), details, path);
     }
 
-    // Getters et Setters
     public boolean isSuccess() { return success; }
     public void setSuccess(boolean success) { this.success = success; }
 

@@ -30,7 +30,6 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        // URL d'autorisation et de token Keycloak
         String authUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/auth";
         String tokenUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
 

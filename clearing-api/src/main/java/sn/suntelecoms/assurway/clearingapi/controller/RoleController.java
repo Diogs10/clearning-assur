@@ -36,7 +36,6 @@ public class RoleController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Lister tous les rôles", description = "Récupère la liste de tous les rôles")
     public ResponseEntity<ApiResponse<List<RoleDTO.RoleResponse>>> getAllRoles() {
-        log.info("API: Liste de tous les rôles");
         List<RoleDTO.RoleResponse> roles = roleService.getAllRoles();
         return ResponseUtil.success(roles, "Liste des rôles récupérée avec succès");
     }
@@ -49,7 +48,6 @@ public class RoleController {
     @Operation(summary = "Créer un rôle", description = "Crée un nouveau rôle")
     public ResponseEntity<ApiResponse<RoleDTO.RoleResponse>> createRole(
             @Valid @RequestBody RoleDTO.CreateRoleRequest request) {
-        log.info("API: Création d'un rôle");
         RoleDTO.RoleResponse role = roleService.createRole(request);
         return ResponseUtil.created(role, "Rôle créé avec succès");
     }
@@ -61,7 +59,6 @@ public class RoleController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Récupérer un rôle", description = "Récupère les détails d'un rôle avec ses privilèges")
     public ResponseEntity<ApiResponse<RoleDTO.RoleResponse>> getRoleById(@PathVariable UUID id) {
-        log.info("API: Récupération du rôle ID: {}", id);
         RoleDTO.RoleResponse role = roleService.getRoleById(id);
         return ResponseUtil.success(role);
     }
@@ -74,7 +71,6 @@ public class RoleController {
     @Operation(summary = "Récupérer les privilèges d'un rôle", description = "Récupère tous les privilèges associés à un rôle")
     public ResponseEntity<ApiResponse<Set<PrivilegeDTO.PrivilegeResponse>>> getRolePrivileges(
             @Valid @RequestBody RoleDTO.GetRolePrivilegesRequest request) {
-        log.info("API: Récupération des privilèges du rôle ID: {}", request.getIdRole());
         Set<PrivilegeDTO.PrivilegeResponse> privileges = roleService.getRolePrivileges(request.getIdRole());
         return ResponseUtil.success(privileges);
     }
@@ -87,7 +83,6 @@ public class RoleController {
     @Operation(summary = "Affecter les privilèges à un rôle", description = "Assigne une liste de privilèges à un rôle")
     public ResponseEntity<ApiResponse<RoleDTO.RoleResponse>> assignPrivilegesToRole(
             @Valid @RequestBody RoleDTO.AssignPrivilegesToRoleRequest request) {
-        log.info("API: Attribution de privilèges au rôle: {}", request.getRole());
         RoleDTO.RoleResponse role = roleService.assignPrivilegesToRole(request.getRole(), request.getPrivileges());
         return ResponseUtil.success(role, "Privilèges attribués avec succès");
     }
@@ -99,7 +94,6 @@ public class RoleController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Supprimer un rôle", description = "Supprime un rôle du système")
     public ResponseEntity<ApiResponse<Void>> deleteRole(@PathVariable UUID id) {
-        log.info("API: Suppression du rôle ID: {}", id);
         roleService.deleteRole(id);
         return ResponseUtil.success(null, "Rôle supprimé avec succès");
     }

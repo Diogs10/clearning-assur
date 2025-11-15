@@ -40,7 +40,6 @@ class PrivilegeController {
             @RequestParam(defaultValue = "0") int offset,
             @RequestParam(defaultValue = "ordre") String sort,
             @RequestParam(defaultValue = "asc") String order) {
-        log.info("API: Liste des privilèges (max={}, offset={})", max, offset);
         Page<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllPrivileges(max, offset, sort, order);
         return ResponseUtil.successPaginated(privileges, "Liste des privilèges récupérée avec succès");
     }
@@ -52,7 +51,6 @@ class PrivilegeController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Lister tous les privilèges (hiérarchique)", description = "Récupère tous les privilèges avec leur hiérarchie parent-enfant")
     public ResponseEntity<ApiResponse<List<PrivilegeDTO.PrivilegeResponse>>> getAllPrivilegesHierarchical() {
-        log.info("API: Liste de tous les privilèges avec hiérarchie");
         List<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllPrivilegesHierarchical();
         return ResponseUtil.success(privileges);
     }
@@ -65,7 +63,6 @@ class PrivilegeController {
     @Operation(summary = "Créer un privilège", description = "Crée un nouveau privilège")
     public ResponseEntity<ApiResponse<PrivilegeDTO.PrivilegeResponse>> createPrivilege(
             @Valid @RequestBody PrivilegeDTO.CreatePrivilegeRequest request) {
-        log.info("API: Création d'un privilège");
         PrivilegeDTO.PrivilegeResponse privilege = privilegeService.createPrivilege(request);
         return ResponseUtil.created(privilege, "Privilège créé avec succès");
     }
@@ -77,7 +74,6 @@ class PrivilegeController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Récupérer un privilège", description = "Récupère les détails d'un privilège")
     public ResponseEntity<ApiResponse<PrivilegeDTO.PrivilegeResponse>> getPrivilegeById(@PathVariable UUID id) {
-        log.info("API: Récupération du privilège ID: {}", id);
         PrivilegeDTO.PrivilegeResponse privilege = privilegeService.getPrivilegeById(id);
         return ResponseUtil.success(privilege);
     }
@@ -91,7 +87,6 @@ class PrivilegeController {
     public ResponseEntity<ApiResponse<PrivilegeDTO.PrivilegeResponse>> updatePrivilege(
             @PathVariable UUID id,
             @Valid @RequestBody PrivilegeDTO.UpdatePrivilegeRequest request) {
-        log.info("API: Mise à jour du privilège ID: {}", id);
         PrivilegeDTO.PrivilegeResponse privilege = privilegeService.updatePrivilege(id, request);
         return ResponseUtil.success(privilege, "Privilège mis à jour avec succès");
     }
@@ -103,7 +98,6 @@ class PrivilegeController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Supprimer un privilège", description = "Supprime un privilège du système")
     public ResponseEntity<ApiResponse<Void>> deletePrivilege(@PathVariable UUID id) {
-        log.info("API: Suppression du privilège ID: {}", id);
         privilegeService.deletePrivilege(id);
         return ResponseUtil.success(null, "Privilège supprimé avec succès");
     }

@@ -32,7 +32,6 @@ public class RoleService {
      */
     @Transactional
     public RoleDTO.RoleResponse createRole(RoleDTO.CreateRoleRequest request) {
-        log.info("Création d'un rôle: {}", request.getAuthority());
 
         if (roleRepository.existsByAuthority(request.getAuthority())) {
             throw new ResourceAlreadyExistsException("Rôle", "authority", request.getAuthority());
@@ -43,7 +42,6 @@ public class RoleService {
         role.setMarchand(request.getMarchand());
 
         Role savedRole = roleRepository.save(role);
-        log.info("Rôle créé avec succès: {}", savedRole.getAuthority());
 
         return mapToRoleResponse(savedRole);
     }
@@ -52,7 +50,6 @@ public class RoleService {
      * Lister tous les rôles
      */
     public List<RoleDTO.RoleResponse> getAllRoles() {
-        log.info("Récupération de tous les rôles");
         List<Role> roles = roleRepository.findAll();
         return roles.stream()
                 .map(this::mapToRoleResponse)
@@ -63,7 +60,6 @@ public class RoleService {
      * Récupérer un rôle par ID avec ses privilèges
      */
     public RoleDTO.RoleResponse getRoleById(UUID id) {
-        log.info("Récupération du rôle ID: {}", id);
         Role role = roleRepository.findByIdWithPrivileges(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rôle", "id", id));
         return mapToRoleResponse(role);
@@ -73,7 +69,6 @@ public class RoleService {
      * Récupérer les privilèges d'un rôle
      */
     public Set<PrivilegeDTO.PrivilegeResponse> getRolePrivileges(UUID roleId) {
-        log.info("Récupération des privilèges du rôle ID: {}", roleId);
         Role role = roleRepository.findByIdWithPrivileges(roleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rôle", "id", roleId));
 
@@ -87,7 +82,6 @@ public class RoleService {
      */
     @Transactional
     public RoleDTO.RoleResponse assignPrivilegesToRole(String roleAuthority, List<UUID> privilegeIds) {
-        log.info("Attribution de privilèges au rôle: {}", roleAuthority);
 
         Role role = roleRepository.findByAuthorityWithPrivileges(roleAuthority)
                 .orElseThrow(() -> new ResourceNotFoundException("Rôle", "authority", roleAuthority));
@@ -101,7 +95,6 @@ public class RoleService {
 
         role.setPrivileges(privileges);
         Role updatedRole = roleRepository.save(role);
-        log.info("Privilèges attribués avec succès au rôle: {}", roleAuthority);
 
         return mapToRoleResponse(updatedRole);
     }
@@ -111,15 +104,12 @@ public class RoleService {
      */
     @Transactional
     public void deleteRole(UUID id) {
-        log.info("Suppression du rôle ID: {}", id);
         if (!roleRepository.existsById(id)) {
             throw new ResourceNotFoundException("Rôle", "id", id);
         }
         roleRepository.deleteById(id);
-        log.info("Rôle supprimé avec succès");
     }
 
-    // Méthodes utilitaires de mapping
     private RoleDTO.RoleResponse mapToRoleResponse(Role role) {
         RoleDTO.RoleResponse response = new RoleDTO.RoleResponse();
         response.setId(role.getId());

@@ -29,7 +29,6 @@ public class TestController {
     @GetMapping("/public/hello")
     @Operation(summary = "Endpoint public", description = "Accessible sans authentification")
     public Map<String, String> publicEndpoint() {
-        log.info("Accès à l'endpoint public");
         Map<String, String> response = new HashMap<>();
         response.put("message", "Bienvenue sur l'API Clearing");
         response.put("status", "public");
@@ -47,7 +46,6 @@ public class TestController {
     )
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public Map<String, Object> userProfile(@AuthenticationPrincipal Jwt jwt) {
-        log.info("Utilisateur connecté: {}", jwt.getSubject());
         
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Profil utilisateur");
@@ -72,7 +70,6 @@ public class TestController {
     )
     @PreAuthorize("hasRole('ADMIN')")
     public Map<String, String> adminDashboard(@AuthenticationPrincipal Jwt jwt) {
-        log.info("Admin connecté: {}", jwt.getSubject());
         
         Map<String, String> response = new HashMap<>();
         response.put("message", "Dashboard administrateur");
@@ -92,7 +89,6 @@ public class TestController {
         security = @SecurityRequirement(name = "bearer-jwt")
     )
     public Map<String, Object> tokenInfo(@AuthenticationPrincipal Jwt jwt) {
-        log.info("Récupération des infos du token pour: {}", jwt.getSubject());
         
         Map<String, Object> response = new HashMap<>();
         response.put("subject", jwt.getSubject());
