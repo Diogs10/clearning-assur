@@ -36,7 +36,6 @@ public class RoleService {
 
         Role role = new Role();
         role.setAuthority(request.getAuthority());
-        role.setMarchand(request.getMarchand());
 
         Role savedRole = roleRepository.save(role);
 
@@ -96,7 +95,6 @@ public class RoleService {
         RoleDTO.RoleResponse response = new RoleDTO.RoleResponse();
         response.setId(role.getId());
         response.setAuthority(role.getAuthority());
-        response.setMarchand(role.getMarchand());
         response.setCreatedAt(role.getCreatedAt());
 
         if (role.getPrivileges() != null) {

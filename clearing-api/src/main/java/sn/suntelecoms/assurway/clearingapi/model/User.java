@@ -57,9 +57,6 @@ public class User {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private Boolean marchand = false;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_role",

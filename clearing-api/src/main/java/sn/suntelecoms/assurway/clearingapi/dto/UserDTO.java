@@ -58,7 +58,6 @@ public class UserDTO {
         private String telephone;
         private Boolean enabled;
         private Boolean hasPasswordUpdate;
-        private Boolean marchand;
         private LocalDateTime createdAt;
         private Set<RoleDTO.RoleResponse> roles;
     }
@@ -72,7 +71,6 @@ public class UserDTO {
         private String email;
         private String telephone;
         private Boolean enabled;
-        private Boolean marchand;
     }
 
     @Data

@@ -54,7 +54,6 @@ public class UserService {
         user.setTelephone(request.getTelephone());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEnabled(true);
-        user.setMarchand(false);
 
         if (request.getRole() != null && !request.getRole().isEmpty()) {
             Role role = roleRepository.findByAuthority(request.getRole())
@@ -105,7 +104,6 @@ public class UserService {
         }
         if (request.getTelephone() != null) user.setTelephone(request.getTelephone());
         if (request.getEnabled() != null) user.setEnabled(request.getEnabled());
-        if (request.getMarchand() != null) user.setMarchand(request.getMarchand());
 
         User updatedUser = userRepository.save(user);
 
@@ -163,7 +161,6 @@ public class UserService {
         response.setTelephone(user.getTelephone());
         response.setEnabled(user.getEnabled());
         response.setHasPasswordUpdate(user.getHasPasswordUpdate());
-        response.setMarchand(user.getMarchand());
         response.setCreatedAt(user.getCreatedAt());
         
         if (user.getRoles() != null) {
@@ -173,7 +170,6 @@ public class UserService {
                             new sn.suntelecoms.assurway.clearingapi.dto.RoleDTO.RoleResponse();
                         roleResponse.setId(role.getId());
                         roleResponse.setAuthority(role.getAuthority());
-                        roleResponse.setMarchand(role.getMarchand());
                         roleResponse.setCreatedAt(role.getCreatedAt());
                         return roleResponse;
                     })

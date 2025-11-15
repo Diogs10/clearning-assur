@@ -19,7 +19,6 @@ public class RoleDTO {
     public static class CreateRoleRequest {
         @NotBlank(message = "L'authority est obligatoire")
         private String authority;
-        private Boolean marchand = false;
     }
 
     @Data
@@ -28,7 +27,6 @@ public class RoleDTO {
     public static class RoleResponse {
         private UUID id;
         private String authority;
-        private Boolean marchand;
         private LocalDateTime createdAt;
         private Set<PrivilegeDTO.PrivilegeResponse> privileges;
     }

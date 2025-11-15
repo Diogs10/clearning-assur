@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9ed90c64-7d26-4c25-9816-7bfd82ed7918" name="Changes" comment="" />
+    <list default="true" id="9ed90c64-7d26-4c25-9816-7bfd82ed7918" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/clearing-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/clearing-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/dto/RoleDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/dto/RoleDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/dto/UserDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/dto/UserDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/model/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/model/Role.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/service/RoleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/service/RoleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/clearing-api/src/main/java/sn/suntelecoms/assurway/clearingapi/service/UserService.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="35URimko8069v95HEVvAT6yel2w" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -18,6 +29,9 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
@@ -40,6 +54,7 @@
       <option name="presentableId" value="Default" />
       <updated>1763162805749</updated>
       <workItem from="1763162808717" duration="94000" />
+      <workItem from="1763241520262" duration="11000" />
     </task>
     <servers />
   </component>
