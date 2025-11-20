@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import sn.suntelecoms.assurway.clearingapi.dto.ApiResponse;
 import sn.suntelecoms.assurway.clearingapi.dto.PaginatedResponse;
 import sn.suntelecoms.assurway.clearingapi.dto.PrivilegeDTO;
-import sn.suntelecoms.assurway.clearingapi.dto.RoleDTO;
 import sn.suntelecoms.assurway.clearingapi.service.PrivilegeService;
 import sn.suntelecoms.assurway.clearingapi.util.ResponseUtil;
 

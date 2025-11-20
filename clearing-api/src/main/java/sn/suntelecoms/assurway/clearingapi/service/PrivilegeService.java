@@ -9,12 +9,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.suntelecoms.assurway.clearingapi.dto.PrivilegeDTO;
-import sn.suntelecoms.assurway.clearingapi.dto.RoleDTO;
 import sn.suntelecoms.assurway.clearingapi.exception.BusinessException;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceAlreadyExistsException;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceNotFoundException;
 import sn.suntelecoms.assurway.clearingapi.model.Privilege;
-import sn.suntelecoms.assurway.clearingapi.model.Role;
 import sn.suntelecoms.assurway.clearingapi.repository.PrivilegeRepository;
 
 import java.util.ArrayList;

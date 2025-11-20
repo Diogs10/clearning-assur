@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sn.suntelecoms.assurway.clearingapi.dto.ApiResponse;
 import sn.suntelecoms.assurway.clearingapi.dto.PaginatedResponse;
-import sn.suntelecoms.assurway.clearingapi.dto.RoleDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.UserDTO;
 import sn.suntelecoms.assurway.clearingapi.service.UserService;
 import sn.suntelecoms.assurway.clearingapi.util.ResponseUtil;
