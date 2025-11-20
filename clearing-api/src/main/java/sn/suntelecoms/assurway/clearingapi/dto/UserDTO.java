@@ -35,6 +35,7 @@ public class UserDTO {
         private String telephone;
 
         private String role;
+        private UUID assureurId;
     }
 
     @Data
@@ -60,6 +61,7 @@ public class UserDTO {
         private Boolean hasPasswordUpdate;
         private LocalDateTime createdAt;
         private Set<RoleDTO.RoleResponse> roles;
+        private AssureurDTO.AssureurResponse assureur;
     }
 
     @Data
@@ -71,6 +73,7 @@ public class UserDTO {
         private String email;
         private String telephone;
         private Boolean enabled;
+        private UUID assureurId;
     }
 
     @Data
