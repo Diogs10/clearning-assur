@@ -1,0 +1,135 @@
+# ===========================================
+# SERVER CONFIGURATION
+# ===========================================
+server:
+  port: 8081
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: clearing-api
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/clearing_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: passer
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/clearing-realm
+          jwk-set-uri: http://localhost:8080/realms/clearing-realm/protocol/openid-connect/certs
+
+# ===========================================
+# KEYCLOAK ADMIN CLIENT (facultatif)
+# ===========================================
+keycloak:
+  auth-server-url: http://localhost:8080
+  realm: clearing-realm
+  resource: clearing-api-client
+  credentials:
+    secret: gvdVRqPEXYthHS61xL7ZNBpCHiw3wRPy
+
+  admin:
+    username: admin
+    password: admin
+    client-id: admin-cli
+
+# ===========================================
+# CORS CONFIGURATION
+# ===========================================
+cors:
+  allowed-origins: "http://localhost:4200"
+  allowed-methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS"
+  allowed-headers: "*"
+  exposed-headers: "Authorization"
+  allow-credentials: true
+  max-age: 3600
+
+# ===========================================
+# ACTUATOR + PROMETHEUS
+# ===========================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+# ===========================================
+# SWAGGER / OPENAPI
+# ===========================================
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
+# ===========================================
+# FILE UPLOAD
+# ===========================================
+file:
+  upload-dir: ./uploads
+
+# ===========================================
+# LOGGING
+# ===========================================
+logging:
+  level:
+    root: INFO
+    sn.suntelecoms.assurway: DEBUG
+    org.springframework.security: DEBUG
+    org.keycloak: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# ===========================================
+# RESILIENCE4J
+# ===========================================
+resilience4j:
+  circuitbreaker:
+    instances:
+      default:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
