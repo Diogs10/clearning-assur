@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import sn.suntelecoms.assurway.clearingapi.dto.ApiResponse;
 import sn.suntelecoms.assurway.clearingapi.dto.PaginatedResponse;
 import sn.suntelecoms.assurway.clearingapi.dto.PrivilegeDTO;
+import sn.suntelecoms.assurway.clearingapi.dto.RoleDTO;
 import sn.suntelecoms.assurway.clearingapi.service.PrivilegeService;
 import sn.suntelecoms.assurway.clearingapi.util.ResponseUtil;
 
@@ -39,6 +40,14 @@ public class PrivilegeController {
             @RequestParam(defaultValue = "asc") String order) {        
         Page<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllPrivileges(page, size, sort, order);
         return ResponseUtil.successPaginated(privileges, "Liste des privilèges récupérée avec succès");
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "Lister tous les privilèges (sans pagination)", description = "Récupère la liste complète de tous les privilèges")
+    public ResponseEntity<ApiResponse<List<PrivilegeDTO.PrivilegeResponse>>> getAllPrivilegesAsList() {
+        List<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllPrivilegesAsList();
+        return ResponseUtil.success(privileges, "Liste complète des privilèges récupérée avec succès");
     }
 
     @GetMapping("/liste-privileges")
