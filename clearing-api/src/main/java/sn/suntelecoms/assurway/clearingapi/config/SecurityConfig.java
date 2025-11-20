@@ -32,6 +32,9 @@ public class SecurityConfig {
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
 
+    @Value("${keycloak.resource}")
+    private String keycloakClientId;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -67,9 +70,8 @@ public class SecurityConfig {
             Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
 
             if (resourceAccess != null) {
-                String clientId = "clearing-api-client";
 
-                Map<String, Object> clientAccess = (Map<String, Object>) resourceAccess.get(clientId);
+                Map<String, Object> clientAccess = (Map<String, Object>) resourceAccess.get(keycloakClientId);
 
                 if (clientAccess != null && clientAccess.containsKey("roles")) {
                     Collection<String> roles = (Collection<String>) clientAccess.get("roles");
