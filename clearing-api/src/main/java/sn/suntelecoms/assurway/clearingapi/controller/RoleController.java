@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/roles")
+@RequestMapping("/roles")
 @RequiredArgsConstructor
 @Tag(name = "Roles", description = "API de gestion des rôles")
 @SecurityRequirement(name = "bearer-jwt")
