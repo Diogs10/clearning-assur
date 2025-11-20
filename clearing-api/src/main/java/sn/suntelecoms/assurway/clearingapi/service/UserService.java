@@ -91,6 +91,13 @@ public class UserService {
         return users.map(this::mapToUserResponse);
     }
 
+    public List<UserDTO.UserResponse> getAllUsersAsList() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional
     public UserDTO.UserResponse updateUser(UUID id, UserDTO.UpdateUserRequest request) {

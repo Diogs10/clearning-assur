@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sn.suntelecoms.assurway.clearingapi.dto.ApiResponse;
 import sn.suntelecoms.assurway.clearingapi.dto.PaginatedResponse;
+import sn.suntelecoms.assurway.clearingapi.dto.RoleDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.UserDTO;
 import sn.suntelecoms.assurway.clearingapi.service.UserService;
 import sn.suntelecoms.assurway.clearingapi.util.ResponseUtil;
@@ -55,6 +56,14 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size) {
         Page<UserDTO.UserResponse> users = userService.getAllUsers(page, size); 
         return ResponseUtil.successPaginated(users, "Liste des utilisateurs récupérée avec succès");
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "Lister tous les utilisateurs (sans pagination)", description = "Récupère la liste complète de tous les utilisateurs")
+    public ResponseEntity<ApiResponse<List<UserDTO.UserResponse>>> getAllUsersAsList() {
+        List<UserDTO.UserResponse> roles = userService.getAllUsersAsList();
+        return ResponseUtil.success(roles, "Liste complète des utilisateurs récupérée avec succès");
     }
 
     @GetMapping("/{id}")
