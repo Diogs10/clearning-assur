@@ -25,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Privileges", description = "API de gestion des privilèges")
 @SecurityRequirement(name = "bearer-jwt")
-class PrivilegeController {
+public class PrivilegeController {
 
     private final PrivilegeService privilegeService;
 
@@ -33,19 +33,19 @@ class PrivilegeController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Lister les privilèges paginés", description = "Récupère la liste paginée des privilèges")
     public ResponseEntity<ApiResponse<PaginatedResponse<PrivilegeDTO.PrivilegeResponse>>> getAllPrivileges(
+            @RequestParam(defaultValue = "0") int page, 
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "ordre") String sort,
-            @RequestParam(defaultValue = "asc") String order) {
-        Page<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllPrivileges(size, page, sort, order);
+            @RequestParam(defaultValue = "asc") String order) {        
+        Page<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllPrivileges(page, size, sort, order);
         return ResponseUtil.successPaginated(privileges, "Liste des privilèges récupérée avec succès");
     }
 
     @GetMapping("/liste-privileges")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "Lister tous les privilèges (hiérarchique)", description = "Récupère tous les privilèges avec leur hiérarchie parent-enfant")
+    @Operation(summary = "Lister tous les privilèges racines (hiérarchique)", description = "Récupère tous les privilèges racines avec leur hiérarchie parent-enfant")
     public ResponseEntity<ApiResponse<List<PrivilegeDTO.PrivilegeResponse>>> getAllPrivilegesHierarchical() {
-        List<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllPrivilegesHierarchical();
+        List<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllRootPrivilegesHierarchical();
         return ResponseUtil.success(privileges);
     }
 
