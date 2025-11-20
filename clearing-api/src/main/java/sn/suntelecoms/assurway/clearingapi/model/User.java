@@ -43,6 +43,9 @@ public class User {
     @Column(nullable = false)
     private String telephone;
 
+    @Column(nullable = false)
+    private String keycloakId;
+    
     @JsonIgnore
     @Column(nullable = false)
     private String password;

@@ -49,14 +49,14 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private Role createAdminRoleIfNotExists() {
-        Optional<Role> existingRole = roleRepository.findByAuthority("ROLE_ADMIN");
+        Optional<Role> existingRole = roleRepository.findByAuthority("ADMIN");
         
         if (existingRole.isPresent()) {
             return existingRole.get();
         }
 
         Role adminRole = new Role();
-        adminRole.setAuthority("ROLE_ADMIN");
+        adminRole.setAuthority("ADMIN");
         adminRole = roleRepository.save(adminRole);
         
         return adminRole;

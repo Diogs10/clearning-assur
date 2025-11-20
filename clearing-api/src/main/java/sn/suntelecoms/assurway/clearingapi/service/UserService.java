@@ -18,7 +18,9 @@ import sn.suntelecoms.assurway.clearingapi.model.Role;
 import sn.suntelecoms.assurway.clearingapi.model.User;
 import sn.suntelecoms.assurway.clearingapi.repository.RoleRepository;
 import sn.suntelecoms.assurway.clearingapi.repository.UserRepository;
+import sn.suntelecoms.assurway.clearingapi.service.KeycloakUserManagementService.UserAlreadyExistsException;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +35,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final KeycloakUserManagementService keycloakUserManagementService;
 
     @Transactional
     public UserDTO.UserResponse createUser(UserDTO.CreateUserRequest request) {
@@ -54,21 +57,38 @@ public class UserService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setTelephone(request.getTelephone());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword())); 
         user.setEnabled(true);
-
+        user.setHasPasswordUpdate(false);
+        String roleAuthority;
         if (request.getRole() != null && !request.getRole().isEmpty()) {
             Role role = roleRepository.findByAuthority(request.getRole())
                     .orElseThrow(() -> new ResourceNotFoundException("Rôle", "authority", request.getRole()));
             user.getRoles().add(role);
+            roleAuthority = role.getAuthority();
         } else {
             Role defaultRole = roleRepository.findByAuthority("USER")
                     .orElseThrow(() -> new ResourceNotFoundException("Rôle USER non trouvé"));
             user.getRoles().add(defaultRole);
+            roleAuthority = defaultRole.getAuthority();
+        }
+        try {
+            String keycloakId = keycloakUserManagementService.createUser(
+                request.getEmail(),
+                request.getEmail(),
+                request.getFirstName(),
+                request.getLastName(),
+                request.getPassword(),
+                roleAuthority
+            );
+            
+            user.setKeycloakId(keycloakId); 
+
+        } catch (UserAlreadyExistsException e) {
+            throw new ResourceAlreadyExistsException("Utilisateur Keycloak", "email", request.getEmail());
         }
 
         User savedUser = userRepository.save(user);
-
         return mapToUserResponse(savedUser);
     }
 
@@ -104,6 +124,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "id", id));
 
+        // TODO: Ajouter ici la logique de mise à jour Keycloak
         if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
         if (request.getLastName() != null) user.setLastName(request.getLastName());
         if (request.getEmail() != null) {
@@ -122,10 +143,12 @@ public class UserService {
 
     @Transactional
     public void deleteUser(UUID id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Utilisateur", "id", id);
-        }
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "id", id));
+        
+        // TODO: Ajouter ici la logique de suppression Keycloak
+        
+        userRepository.delete(user);
     }
 
     @Transactional
@@ -137,6 +160,8 @@ public class UserService {
             throw new BusinessException("Ancien mot de passe incorrect");
         }
 
+        // TODO: Ajouter ici la logique de changement de mot de passe Keycloak
+        
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setHasPasswordUpdate(true);
         userRepository.save(user);
@@ -154,6 +179,8 @@ public class UserService {
             roles.add(role);
         }
 
+        // TODO: Ajouter ici la logique d'assignation de rôle Keycloak
+        
         user.setRoles(roles);
         User updatedUser = userRepository.save(user);
 

@@ -76,7 +76,7 @@ public class SecurityConfig {
                 if (clientAccess != null && clientAccess.containsKey("roles")) {
                     Collection<String> roles = (Collection<String>) clientAccess.get("roles");
                     authorities.addAll(roles.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())) 
+                        .map(role -> new SimpleGrantedAuthority(role.toUpperCase())) 
                         .collect(Collectors.toList()));
                 }
             }
