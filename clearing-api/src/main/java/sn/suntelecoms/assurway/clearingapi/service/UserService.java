@@ -84,8 +84,9 @@ public class UserService {
         return mapToUserResponse(user);
     }
 
-    public Page<UserDTO.UserResponse> getAllUsers(int size, int page) {
-        Pageable pageable = PageRequest.of(page / size, size);
+    public Page<UserDTO.UserResponse> getAllUsers(int page, int size) {
+        int safePage = Math.max(0, page); 
+        Pageable pageable = PageRequest.of(safePage, size);
         Page<User> users = userRepository.findAll(pageable);
         return users.map(this::mapToUserResponse);
     }
