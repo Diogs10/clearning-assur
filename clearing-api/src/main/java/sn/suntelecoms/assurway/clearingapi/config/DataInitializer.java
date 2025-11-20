@@ -104,7 +104,6 @@ public class DataInitializer implements CommandLineRunner {
             user.setCredentials(Collections.singletonList(password));
 
             keycloakAdmin.realm(realm).users().create(user);
-            log.info("Utilisateur admin créé dans Keycloak");
         } else {
             log.info("Utilisateur admin déjà présent dans Keycloak");
         }

@@ -77,7 +77,6 @@ public class KeycloakUserManagementService {
 
             if (status == 201) {
                 String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
-                log.info("Utilisateur créé dans Keycloak avec succès: ID='{}', Username='{}'", userId, username);
 
                 UserResource userResource = usersResource.get(userId);
                 CredentialRepresentation credential = new CredentialRepresentation();
@@ -92,7 +91,6 @@ public class KeycloakUserManagementService {
 
                 return userId;
             } else if (status == 409) {
-                log.warn("Tentative de création d'un utilisateur existant: {}", username);
                 throw new UserAlreadyExistsException("Un utilisateur avec cet email ou nom d'utilisateur existe déjà.");
             } else {
                 throw new KeycloakAdminException("Échec de la création de l'utilisateur (Code: " + status + "): " + response.getStatusInfo());
@@ -100,7 +98,6 @@ public class KeycloakUserManagementService {
         } catch (UserAlreadyExistsException | KeycloakAdminException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Erreur inattendue lors de la création de l'utilisateur", e);
             throw new KeycloakAdminException("Erreur lors de la création de l'utilisateur.", e);
         }
     }
@@ -115,10 +112,8 @@ public class KeycloakUserManagementService {
                 userResource.roles().realmLevel().add(Collections.singletonList(role));
             }
         } catch (jakarta.ws.rs.NotFoundException e) {
-             log.warn("Tentative d'assignation de rôle à l'utilisateur {} avec un rôle inexistant.", userId, e);
              throw new KeycloakAdminException("Erreur: L'utilisateur ou un des rôles spécifiés est introuvable.", e);
         } catch (Exception e) {
-            log.error("Erreur lors de l'assignation des rôles à l'utilisateur {}", userId, e);
             throw new KeycloakAdminException("Erreur lors de l'assignation des rôles.", e);
         }
     }
@@ -128,7 +123,6 @@ public class KeycloakUserManagementService {
             RealmResource realmResource = keycloak.realm(realm);
             return realmResource.users().list();
         } catch (Exception e) {
-            log.error("Erreur lors de la récupération de la liste des utilisateurs", e);
             throw new KeycloakAdminException("Erreur lors de la récupération des utilisateurs.", e);
         }
     }
@@ -138,10 +132,8 @@ public class KeycloakUserManagementService {
             RealmResource realmResource = keycloak.realm(realm);
             return realmResource.users().get(userId).toRepresentation();
         } catch (jakarta.ws.rs.NotFoundException e) {
-             log.warn("Utilisateur introuvable pour l'ID: {}", userId);
              throw new KeycloakAdminException("Utilisateur introuvable.", e);
         } catch (Exception e) {
-            log.error("Erreur lors de la récupération de l'utilisateur {}", userId, e);
             throw new KeycloakAdminException("Erreur lors de la récupération de l'utilisateur.", e);
         }
     }
@@ -151,10 +143,8 @@ public class KeycloakUserManagementService {
             RealmResource realmResource = keycloak.realm(realm);
             realmResource.users().get(userId).remove();
         }  catch (jakarta.ws.rs.NotFoundException e) {
-             log.warn("Tentative de suppression d'un utilisateur introuvable: {}", userId);
              throw new KeycloakAdminException("Utilisateur introuvable pour la suppression.", e);
         } catch (Exception e) {
-            log.error("Erreur lors de la suppression de l'utilisateur {}", userId, e);
             throw new KeycloakAdminException("Erreur lors de la suppression de l'utilisateur.", e);
         }
     }
@@ -172,10 +162,8 @@ public class KeycloakUserManagementService {
 
             userResource.update(user);
         } catch (jakarta.ws.rs.NotFoundException e) {
-             log.warn("Tentative de mise à jour d'un utilisateur introuvable: {}", userId);
              throw new KeycloakAdminException("Utilisateur introuvable pour la mise à jour.", e);
         } catch (Exception e) {
-            log.error("Erreur lors de la mise à jour de l'utilisateur {}", userId, e);
             throw new KeycloakAdminException("Erreur lors de la mise à jour de l'utilisateur.", e);
         }
     }
@@ -192,10 +180,8 @@ public class KeycloakUserManagementService {
 
             userResource.resetPassword(credential);
         } catch (jakarta.ws.rs.NotFoundException e) {
-             log.warn("Tentative de réinitialisation de mot de passe pour un utilisateur introuvable: {}", userId);
              throw new KeycloakAdminException("Utilisateur introuvable pour la réinitialisation du mot de passe.", e);
         } catch (Exception e) {
-            log.error("Erreur lors de la réinitialisation du mot de passe de l'utilisateur {}", userId, e);
             throw new KeycloakAdminException("Erreur lors de la réinitialisation du mot de passe.", e);
         }
     }

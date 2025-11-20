@@ -2,6 +2,7 @@ package sn.suntelecoms.assurway.clearingapi.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,10 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final PrivilegeRepository privilegeRepository;
+    private final KeycloakRoleManagementService keycloakRoleService;
+
+    @Value("${keycloak.roles.auto-sync:false}")
+    private boolean autoSyncEnabled;
 
     @Transactional
     public RoleDTO.RoleResponse createRole(RoleDTO.CreateRoleRequest request) {
@@ -41,6 +46,9 @@ public class RoleService {
         role.setAuthority(request.getAuthority());
 
         Role savedRole = roleRepository.save(role);
+        if (autoSyncEnabled) {
+            syncRoleToKeycloak(savedRole.getAuthority());
+        }
 
         return mapToRoleResponse(savedRole);
     }
@@ -98,7 +106,46 @@ public class RoleService {
         if (!roleRepository.existsById(id)) {
             throw new ResourceNotFoundException("Rôle", "id", id);
         }
+
+        String authority = null;
+        if (autoSyncEnabled) {
+            Role role = roleRepository.findById(id).orElse(null);
+            if (role != null) {
+                authority = role.getAuthority();
+            }
+        }
+
         roleRepository.deleteById(id);
+        if (autoSyncEnabled && authority != null) {
+            deleteRoleFromKeycloak(authority);
+        }
+    }
+
+    private void syncRoleToKeycloak(String authority) {
+        try {
+            if (keycloakRoleService.roleExists(authority)) {
+                log.debug("Le rôle '{}' existe déjà dans Keycloak", authority);
+            } else {
+                String description = "Rôle synchronisé automatiquement: " + authority;
+                keycloakRoleService.createRole(authority, description);
+            }
+        } catch (Exception e) {
+            log.error("✗ Échec de synchronisation du rôle '{}' vers Keycloak: {}", 
+                     authority, e.getMessage(), e);
+        }
+    }
+
+    private void deleteRoleFromKeycloak(String authority) {
+        try {
+            if (keycloakRoleService.roleExists(authority)) {
+                keycloakRoleService.deleteRole(authority);
+            } else {
+                log.debug("Le rôle '{}' n'existe pas dans Keycloak", authority);
+            }
+        } catch (Exception e) {
+            log.error("✗ Échec de suppression du rôle '{}' de Keycloak: {}", 
+                     authority, e.getMessage(), e);
+        }
     }
 
     private RoleDTO.RoleResponse mapToRoleResponse(Role role) {
