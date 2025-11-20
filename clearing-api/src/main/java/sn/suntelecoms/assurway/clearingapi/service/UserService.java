@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import sn.suntelecoms.assurway.clearingapi.dto.RoleDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.UserDTO;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceAlreadyExistsException;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceNotFoundException;
@@ -82,8 +84,8 @@ public class UserService {
         return mapToUserResponse(user);
     }
 
-    public Page<UserDTO.UserResponse> getAllUsers(int max, int offset) {
-        Pageable pageable = PageRequest.of(offset / max, max);
+    public Page<UserDTO.UserResponse> getAllUsers(int size, int page) {
+        Pageable pageable = PageRequest.of(page / size, size);
         Page<User> users = userRepository.findAll(pageable);
         return users.map(this::mapToUserResponse);
     }
@@ -166,8 +168,8 @@ public class UserService {
         if (user.getRoles() != null) {
             response.setRoles(user.getRoles().stream()
                     .map(role -> {
-                        sn.suntelecoms.assurway.clearingapi.dto.RoleDTO.RoleResponse roleResponse = 
-                            new sn.suntelecoms.assurway.clearingapi.dto.RoleDTO.RoleResponse();
+                        RoleDTO.RoleResponse roleResponse = 
+                            new RoleDTO.RoleResponse();
                         roleResponse.setId(role.getId());
                         roleResponse.setAuthority(role.getAuthority());
                         roleResponse.setCreatedAt(role.getCreatedAt());

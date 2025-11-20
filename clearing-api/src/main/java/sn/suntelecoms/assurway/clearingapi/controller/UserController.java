@@ -51,9 +51,9 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lister les utilisateurs", description = "Récupère la liste paginée des utilisateurs")
     public ResponseEntity<ApiResponse<PaginatedResponse<UserDTO.UserResponse>>> getAllUsers(
-            @RequestParam(defaultValue = "10") int max,
-            @RequestParam(defaultValue = "0") int offset) {
-        Page<UserDTO.UserResponse> users = userService.getAllUsers(max, offset);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "0") int page) {
+        Page<UserDTO.UserResponse> users = userService.getAllUsers(size, page);
         return ResponseUtil.successPaginated(users, "Liste des utilisateurs récupérée avec succès");
     }
 

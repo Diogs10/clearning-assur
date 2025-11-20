@@ -54,13 +54,13 @@ public class PrivilegeService {
         return mapToPrivilegeResponse(savedPrivilege);
     }
 
-    public Page<PrivilegeDTO.PrivilegeResponse> getAllPrivileges(int max, int offset, String sort, String order) {
+    public Page<PrivilegeDTO.PrivilegeResponse> getAllPrivileges(int size, int page, String sort, String order) {
 
         Sort sortBy = order.equalsIgnoreCase("desc") 
             ? Sort.by(sort).descending() 
             : Sort.by(sort).ascending();
 
-        Pageable pageable = PageRequest.of(offset / max, max, sortBy);
+        Pageable pageable = PageRequest.of(page / size, size, sortBy);
         Page<Privilege> privileges = privilegeRepository.findAll(pageable);
 
         return privileges.map(this::mapToPrivilegeResponse);

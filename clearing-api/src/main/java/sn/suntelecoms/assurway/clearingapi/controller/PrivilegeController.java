@@ -33,11 +33,11 @@ class PrivilegeController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Lister les privilèges paginés", description = "Récupère la liste paginée des privilèges")
     public ResponseEntity<ApiResponse<PaginatedResponse<PrivilegeDTO.PrivilegeResponse>>> getAllPrivileges(
-            @RequestParam(defaultValue = "10") int max,
-            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "ordre") String sort,
             @RequestParam(defaultValue = "asc") String order) {
-        Page<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllPrivileges(max, offset, sort, order);
+        Page<PrivilegeDTO.PrivilegeResponse> privileges = privilegeService.getAllPrivileges(size, page, sort, order);
         return ResponseUtil.successPaginated(privileges, "Liste des privilèges récupérée avec succès");
     }
 
