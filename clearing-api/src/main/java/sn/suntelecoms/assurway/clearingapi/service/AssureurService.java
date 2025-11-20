@@ -39,6 +39,7 @@ public class AssureurService {
         assureur.setTelephone(request.getTelephone());
         assureur.setEmail(request.getEmail());
         assureur.setLogo(request.getLogo());
+        assureur.setCreatedAt(assureur.getCreatedAt());
 
         Assureur saved = assureurRepository.save(assureur);
         return mapToDTO(saved);
@@ -105,6 +106,7 @@ public class AssureurService {
         dto.setTelephone(assureur.getTelephone());
         dto.setEmail(assureur.getEmail());
         dto.setLogo(assureur.getLogo());
+        dto.setCreatedAt(assureur.getCreatedAt());
         return dto;
     }
 }
