@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("") 
 @Tag(name = "Test", description = "Endpoints de test de l'authentification")
 public class TestController {
 
@@ -44,7 +44,7 @@ public class TestController {
         response.put("email", jwt.getClaimAsString("email"));
         response.put("firstName", jwt.getClaimAsString("given_name"));
         response.put("lastName", jwt.getClaimAsString("family_name"));
-        response.put("roles", jwt.getClaimAsMap("realm_access").get("roles"));
+        response.put("keycloakRoles", jwt.getClaimAsMap("realm_access"));
         response.put("userId", jwt.getSubject());
         
         return response;
@@ -80,7 +80,7 @@ public class TestController {
         response.put("issuer", jwt.getIssuer());
         response.put("issuedAt", jwt.getIssuedAt());
         response.put("expiresAt", jwt.getExpiresAt());
-        response.put("claims", jwt.getClaims());
+        response.put("claims", jwt.getClaims()); 
         
         return response;
     }
