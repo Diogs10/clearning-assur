@@ -168,8 +168,7 @@ public class UserService {
         if (user.getRoles() != null) {
             response.setRoles(user.getRoles().stream()
                     .map(role -> {
-                        RoleDTO.RoleResponse roleResponse = 
-                            new RoleDTO.RoleResponse();
+                        RoleDTO.RoleResponse roleResponse = new RoleDTO.RoleResponse();
                         roleResponse.setId(role.getId());
                         roleResponse.setAuthority(role.getAuthority());
                         roleResponse.setCreatedAt(role.getCreatedAt());
