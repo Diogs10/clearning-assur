@@ -10,18 +10,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.ws.rs.NotFoundException;
+import sn.suntelecoms.assurway.clearingapi.dto.AssureurDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.RoleDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.UserDTO;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceAlreadyExistsException;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceNotFoundException;
 import sn.suntelecoms.assurway.clearingapi.exception.BusinessException;
+import sn.suntelecoms.assurway.clearingapi.model.Assureur;
 import sn.suntelecoms.assurway.clearingapi.model.Role;
 import sn.suntelecoms.assurway.clearingapi.model.User;
+import sn.suntelecoms.assurway.clearingapi.repository.AssureurRepository;
 import sn.suntelecoms.assurway.clearingapi.repository.RoleRepository;
 import sn.suntelecoms.assurway.clearingapi.repository.UserRepository;
 import sn.suntelecoms.assurway.clearingapi.service.KeycloakUserManagementService.UserAlreadyExistsException;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +39,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final AssureurRepository assureurRepository;
     private final PasswordEncoder passwordEncoder;
     private final KeycloakUserManagementService keycloakUserManagementService;
 
@@ -63,6 +66,11 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword())); 
         user.setEnabled(true);
         user.setHasPasswordUpdate(false);
+        if (request.getAssureurId() != null) {
+            Assureur assureur = assureurRepository.findById(request.getAssureurId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Assureur", "id", request.getAssureurId()));
+            user.setAssureur(assureur);
+        }
         String roleAuthority;
         if (request.getRole() != null && !request.getRole().isEmpty()) {
             Role role = roleRepository.findByAuthority(request.getRole())
@@ -136,7 +144,12 @@ public class UserService {
             user.setEmail(request.getEmail());
         }
         if (request.getTelephone() != null) user.setTelephone(request.getTelephone());
-        if (request.getEnabled() != null) user.setEnabled(request.getEnabled());        
+        if (request.getEnabled() != null) user.setEnabled(request.getEnabled());
+        if (request.getAssureurId() != null) {
+            Assureur assureur = assureurRepository.findById(request.getAssureurId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Assureur", "id", request.getAssureurId()));
+            user.setAssureur(assureur);
+        }       
         try {
             Map<String, List<String>> attributes = new HashMap<>();
             if (request.getTelephone() != null) {
@@ -227,6 +240,17 @@ public class UserService {
         response.setEnabled(user.getEnabled());
         response.setHasPasswordUpdate(user.getHasPasswordUpdate());
         response.setCreatedAt(user.getCreatedAt());
+        if (user.getAssureur() != null) {
+            response.setAssureur(new AssureurDTO.AssureurResponse(
+                    user.getAssureur().getId(),
+                    user.getAssureur().getNom(),
+                    user.getAssureur().getAdresse(),
+                    user.getAssureur().getTelephone(),
+                    user.getAssureur().getEmail(),
+                    user.getAssureur().getLogo(),
+                    user.getAssureur().getCreatedAt()
+            ));
+        }
         
         if (user.getRoles() != null) {
             response.setRoles(user.getRoles().stream()
