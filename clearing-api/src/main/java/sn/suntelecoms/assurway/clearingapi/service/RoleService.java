@@ -2,6 +2,9 @@ package sn.suntelecoms.assurway.clearingapi.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.suntelecoms.assurway.clearingapi.dto.PrivilegeDTO;
@@ -42,7 +45,14 @@ public class RoleService {
         return mapToRoleResponse(savedRole);
     }
 
-    public List<RoleDTO.RoleResponse> getAllRoles() {
+    public Page<RoleDTO.RoleResponse> getAllRoles(int page, int size) {
+        int safePage = Math.max(0, page); 
+        Pageable pageable = PageRequest.of(safePage, size);
+        Page<Role> rolesPage = roleRepository.findAll(pageable);        
+        return rolesPage.map(this::mapToRoleResponse);
+    }
+
+    public List<RoleDTO.RoleResponse> getAllRolesAsList() {
         List<Role> roles = roleRepository.findAll();
         return roles.stream()
                 .map(this::mapToRoleResponse)

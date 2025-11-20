@@ -6,10 +6,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sn.suntelecoms.assurway.clearingapi.dto.ApiResponse;
+import sn.suntelecoms.assurway.clearingapi.dto.PaginatedResponse;
 import sn.suntelecoms.assurway.clearingapi.dto.PrivilegeDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.RoleDTO;
 import sn.suntelecoms.assurway.clearingapi.service.RoleService;
@@ -30,12 +32,24 @@ public class RoleController {
     private final RoleService roleService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "Lister tous les rôles", description = "Récupère la liste de tous les rôles")
-    public ResponseEntity<ApiResponse<List<RoleDTO.RoleResponse>>> getAllRoles() {
-        List<RoleDTO.RoleResponse> roles = roleService.getAllRoles();
-        return ResponseUtil.success(roles, "Liste des rôles récupérée avec succès");
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Lister les rôles (paginé)", description = "Récupère la liste paginée des rôles")
+    public ResponseEntity<ApiResponse<PaginatedResponse<RoleDTO.RoleResponse>>> getAllRoles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        Page<RoleDTO.RoleResponse> roles = roleService.getAllRoles(page, size);
+        return ResponseUtil.successPaginated(roles, "Liste des rôles récupérée avec succès");
     }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "Lister tous les rôles (sans pagination)", description = "Récupère la liste complète de tous les rôles")
+    public ResponseEntity<ApiResponse<List<RoleDTO.RoleResponse>>> getAllRolesAsList() {
+        List<RoleDTO.RoleResponse> roles = roleService.getAllRolesAsList();
+        return ResponseUtil.success(roles, "Liste complète des rôles récupérée avec succès");
+    }
+
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
