@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.ws.rs.NotFoundException;
 import sn.suntelecoms.assurway.clearingapi.dto.RoleDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.UserDTO;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceAlreadyExistsException;
@@ -21,8 +22,10 @@ import sn.suntelecoms.assurway.clearingapi.repository.UserRepository;
 import sn.suntelecoms.assurway.clearingapi.service.KeycloakUserManagementService.UserAlreadyExistsException;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -124,7 +127,6 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "id", id));
 
-        // TODO: Ajouter ici la logique de mise à jour Keycloak
         if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
         if (request.getLastName() != null) user.setLastName(request.getLastName());
         if (request.getEmail() != null) {
@@ -134,7 +136,22 @@ public class UserService {
             user.setEmail(request.getEmail());
         }
         if (request.getTelephone() != null) user.setTelephone(request.getTelephone());
-        if (request.getEnabled() != null) user.setEnabled(request.getEnabled());
+        if (request.getEnabled() != null) user.setEnabled(request.getEnabled());        
+        try {
+            Map<String, List<String>> attributes = new HashMap<>();
+            if (request.getTelephone() != null) {
+                attributes.put("telephone", List.of(request.getTelephone()));
+            }
+
+            keycloakUserManagementService.updateUser(
+                user.getKeycloakId(),
+                user.getEmail(),
+                user.getFirstName(), 
+                user.getLastName()
+            );
+        } catch (NotFoundException e) {
+            log.warn("Utilisateur local {} existe, mais introuvable dans Keycloak (ID: {}). Poursuite de la mise à jour locale.", id, user.getKeycloakId());
+        }
 
         User updatedUser = userRepository.save(user);
 
@@ -146,7 +163,11 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "id", id));
         
-        // TODO: Ajouter ici la logique de suppression Keycloak
+        try {
+            keycloakUserManagementService.deleteUser(user.getKeycloakId());
+        } catch (NotFoundException e) {
+             log.warn("Utilisateur Keycloak avec l'ID {} introuvable. Procède à la suppression locale.", user.getKeycloakId());
+        }
         
         userRepository.delete(user);
     }
@@ -159,9 +180,13 @@ public class UserService {
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new BusinessException("Ancien mot de passe incorrect");
         }
-
-        // TODO: Ajouter ici la logique de changement de mot de passe Keycloak
         
+        try {
+            keycloakUserManagementService.resetPassword(user.getKeycloakId(), request.getNewPassword());
+        } catch (NotFoundException e) {
+            log.warn("Utilisateur local {} existe, mais introuvable dans Keycloak (ID: {}). Le mot de passe Keycloak n'a pas pu être changé.", userId, user.getKeycloakId());
+        }
+
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setHasPasswordUpdate(true);
         userRepository.save(user);
@@ -178,9 +203,12 @@ public class UserService {
                     .orElseThrow(() -> new ResourceNotFoundException("Rôle", "authority", roleName));
             roles.add(role);
         }
-
-        // TODO: Ajouter ici la logique d'assignation de rôle Keycloak
-        
+        List<String> authorities = roles.stream().map(Role::getAuthority).collect(Collectors.toList());
+        try {
+            keycloakUserManagementService.assignRoles(user.getKeycloakId(), authorities.toArray(new String[0]));
+        } catch (NotFoundException e) {
+             log.warn("Utilisateur local {} existe, mais introuvable dans Keycloak (ID: {}). L'assignation des rôles Keycloak a échoué.", userId, user.getKeycloakId());
+        }
         user.setRoles(roles);
         User updatedUser = userRepository.save(user);
 
