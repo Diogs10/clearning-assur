@@ -14,7 +14,7 @@ import sn.suntelecoms.assurway.clearingapi.util.ResponseUtil;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "API d'authentification et gestion des tokens")
 public class AuthController {
