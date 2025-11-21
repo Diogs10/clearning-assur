@@ -131,12 +131,10 @@ public class UserService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
         if (auth == null || !auth.isAuthenticated()) {
-            log.error("Aucune authentification trouvée dans le contexte de sécurité");
             throw new RuntimeException("Utilisateur non authentifié");
         }
 
         if (!(auth instanceof JwtAuthenticationToken jwtAuth)) {
-            log.error("Type d'authentification invalide: {}", auth.getClass().getName());
             throw new RuntimeException("Type d'authentification invalide");
         }
 
@@ -149,15 +147,12 @@ public class UserService {
         String sub = jwt.getClaimAsString("sub");
         
         if (username == null) {
-            log.error("Claim 'preferred_username' manquant dans le token JWT");
             throw new RuntimeException("Claim 'preferred_username' manquant dans le token");
         }
 
-        log.debug("Recherche de l'utilisateur: username={}, email={}", username, email);
 
         return userRepository.findByUsername(username)
                 .orElseGet(() -> {
-                    log.info("Utilisateur '{}' introuvable en base, création automatique", username);
                     return createUserFromJwt(username, email, firstName, lastName, sub);
                 });
     }
@@ -165,8 +160,6 @@ public class UserService {
     @Transactional
     protected User createUserFromJwt(String username, String email, 
                                     String firstName, String lastName, String keycloakId) {
-        
-        log.info("Création automatique de l'utilisateur: username={}, email={}", username, email);
         
         User newUser = new User();
         newUser.setUsername(username);

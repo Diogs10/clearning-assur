@@ -88,14 +88,12 @@ public class DataInitializer implements CommandLineRunner {
             keycloakAdmin.realm(realm).users().create(user);
             users = keycloakAdmin.realm(realm).users().search(adminEmail);
             if(users.isEmpty()) {
-                log.error("Échec de la récupération de l'ID Keycloak après la création. La création de l'utilisateur local sera ignorée.");
                 return;
             }
             keycloakId = users.get(0).getId();
 
         } else {
             keycloakId = users.get(0).getId();
-            log.info("Utilisateur admin déjà présent dans Keycloak avec l'ID : {}", keycloakId);
         }
 
         final String finalKeycloakId = keycloakId;
@@ -116,7 +114,6 @@ public class DataInitializer implements CommandLineRunner {
                     admin.setKeycloakId(finalKeycloakId);
 
                     userRepository.save(admin);
-                    log.info("Utilisateur admin créé dans la base locale avec keycloak_id : {}", finalKeycloakId);
                 }
         );
     }

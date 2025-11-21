@@ -32,9 +32,6 @@ public class DossierRecoursService {
     private final AssureurRepository assureurRepository;
     private final UserService userService;
 
-    /**
-     * Crée un nouveau dossier de recours
-     */
     @Transactional
     public DossierRecoursDTO.DossierRecoursResponse createDossier(DossierRecoursDTO.DossierRecoursCreateRequest request) {
 
@@ -61,23 +58,11 @@ public class DossierRecoursService {
             currentUser = userService.getCurrentUserWithAssureur();
             assureurSource = currentUser.getAssureur();
             
-            log.info("Utilisateur authentifié: username={}, assureur={}", 
-                     currentUser.getUsername(), 
-                     assureurSource.getId());
-            
         } catch (RuntimeException e) {
-            log.error("Erreur lors de la récupération de l'utilisateur: {}", e.getMessage());
-            
             throw new RuntimeException(
                 "Impossible de créer le dossier: " + e.getMessage() + 
                 " Veuillez contacter l'administrateur pour lier votre compte à un assureur."
             );
-            
-            // Mode permissif (décommentez si besoin):
-            // currentUser = userService.getCurrentUser();
-            // assureurSource = null;
-            // log.warn("Création du dossier sans assureur source pour l'utilisateur: {}", 
-            //          currentUser.getUsername());
         }
 
         DossierRecours dossier = DossierRecours.builder()
@@ -104,11 +89,7 @@ public class DossierRecoursService {
         return mapToResponse(savedDossier);
     }
 
-    /**
-     * Récupère un dossier par son ID
-     */
     public DossierRecoursDTO.DossierRecoursResponse getDossierById(UUID id) {
-        log.debug("Récupération du dossier ID: {}", id);
         
         DossierRecours dossier = dossierRecoursRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dossier de recours", "id", id));
@@ -116,11 +97,7 @@ public class DossierRecoursService {
         return mapToResponse(dossier);
     }
 
-    /**
-     * Récupère un dossier par son numéro
-     */
     public DossierRecoursDTO.DossierRecoursResponse getDossierByNumero(String numeroDossier) {
-        log.debug("Récupération du dossier numéro: {}", numeroDossier);
         
         DossierRecours dossier = dossierRecoursRepository.findByNumeroDossier(numeroDossier)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -132,11 +109,7 @@ public class DossierRecoursService {
         return mapToResponse(dossier);
     }
 
-    /**
-     * Récupère tous les dossiers avec pagination
-     */
     public Page<DossierRecoursDTO.DossierRecoursResponse> getAllDossiers(int page, int size, String sortBy) {
-        log.debug("Récupération de tous les dossiers - page: {}, size: {}", page, size);
         
         Sort sort = Sort.by(Sort.Direction.DESC, sortBy != null ? sortBy : "createdAt");
         Pageable pageable = PageRequest.of(Math.max(0, page), size, sort);
@@ -146,13 +119,9 @@ public class DossierRecoursService {
         return dossiersPage.map(this::mapToResponse);
     }
 
-    /**
-     * Récupère les dossiers par assureur destinataire
-     */
     public Page<DossierRecoursDTO.DossierRecoursResponse> getDossiersByAssureur(
             UUID assureurId, int page, int size) {
         
-        log.debug("Récupération des dossiers de l'assureur: {}", assureurId);
         
         Pageable pageable = PageRequest.of(Math.max(0, page), size, 
                                           Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -163,9 +132,6 @@ public class DossierRecoursService {
         return dossiersPage.map(this::mapToResponse);
     }
 
-    /**
-     * Recherche multicritère
-     */
     public Page<DossierRecoursDTO.DossierRecoursResponse> searchDossiers(
             UUID assureurId,
             String nomAssure,
@@ -177,7 +143,6 @@ public class DossierRecoursService {
             int page,
             int size) {
         
-        log.debug("Recherche de dossiers avec critères multiples");
         
         Pageable pageable = PageRequest.of(Math.max(0, page), size, 
                                           Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -190,13 +155,9 @@ public class DossierRecoursService {
         return dossiersPage.map(this::mapToResponse);
     }
 
-    /**
-     * Recherche par nom de l'assuré
-     */
     public Page<DossierRecoursDTO.DossierRecoursResponse> searchByNomAssure(
             String nomAssure, int page, int size) {
         
-        log.debug("Recherche des dossiers par nom assuré: {}", nomAssure);
         
         Pageable pageable = PageRequest.of(Math.max(0, page), size, 
                                           Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -207,18 +168,13 @@ public class DossierRecoursService {
         return dossiersPage.map(this::mapToResponse);
     }
 
-    /**
-     * Recherche par immatriculation
-     */
     public Page<DossierRecoursDTO.DossierRecoursResponse> searchByImmatriculation(
             String immatriculation, int page, int size) {
         
-        log.debug("Recherche des dossiers par immatriculation: {}", immatriculation);
         
         Pageable pageable = PageRequest.of(Math.max(0, page), size, 
                                           Sort.by(Sort.Direction.DESC, "createdAt"));
         
-        // Chercher dans les deux types d'immatriculation
         Page<DossierRecours> dossiersAssure = 
             dossierRecoursRepository.findByImmatriculationAssure(immatriculation, pageable);
         
@@ -232,11 +188,7 @@ public class DossierRecoursService {
         return dossiersTiers.map(this::mapToResponse);
     }
 
-    /**
-     * Récupère les dossiers récents (derniers N jours)
-     */
     public Page<DossierRecoursDTO.DossierRecoursResponse> getRecentDossiers(int days, int page, int size) {
-        log.debug("Récupération des dossiers des {} derniers jours", days);
         
         LocalDateTime dateDebut = LocalDateTime.now().minusDays(days);
         Pageable pageable = PageRequest.of(Math.max(0, page), size);
@@ -247,17 +199,12 @@ public class DossierRecoursService {
         return dossiersPage.map(this::mapToResponse);
     }
 
-    /**
-     * Met à jour un dossier
-     */
     @Transactional
     public DossierRecoursDTO.DossierRecoursResponse updateDossier(UUID id, DossierRecoursDTO.DossierRecoursUpdateRequest request) {
-        log.info("Mise à jour du dossier ID: {}", id);
         
         DossierRecours dossier = dossierRecoursRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dossier de recours", "id", id));
         
-        // Mise à jour des champs modifiables
         if (request.getCommentaire() != null) {
             dossier.setCommentaire(request.getCommentaire());
         }
@@ -275,31 +222,21 @@ public class DossierRecoursService {
         }
         
         DossierRecours updatedDossier = dossierRecoursRepository.save(dossier);
-        log.info("Dossier mis à jour avec succès: ID={}", updatedDossier.getId());
         
         return mapToResponse(updatedDossier);
     }
 
-    /**
-     * Supprime un dossier
-     */
     @Transactional
     public void deleteDossier(UUID id) {
-        log.info("Suppression du dossier ID: {}", id);
         
         if (!dossierRecoursRepository.existsById(id)) {
             throw new ResourceNotFoundException("Dossier de recours", "id", id);
         }
         
         dossierRecoursRepository.deleteById(id);
-        log.info("Dossier supprimé avec succès: ID={}", id);
     }
 
-    /**
-     * Obtient les statistiques d'un assureur
-     */
     public Map<String, Object> getStatistiquesByAssureur(UUID assureurId) {
-        log.debug("Calcul des statistiques pour l'assureur: {}", assureurId);
         
         Assureur assureur = assureurRepository.findById(assureurId).get();
         long count = dossierRecoursRepository.countByAssureurDestinataireId(assureur);
@@ -313,13 +250,8 @@ public class DossierRecoursService {
         return stats;
     }
 
-    /**
-     * Obtient les statistiques par période
-     */
     public Map<String, Object> getStatistiquesByPeriod(
             LocalDateTime startDate, LocalDateTime endDate) {
-        
-        log.debug("Calcul des statistiques pour la période: {} - {}", startDate, endDate);
         
         Object[] result = dossierRecoursRepository.getStatisticsByPeriod(startDate, endDate);
         
@@ -333,11 +265,7 @@ public class DossierRecoursService {
         return stats;
     }
 
-    /**
-     * Obtient les dossiers avec montant élevé
-     */
     public List<DossierRecoursDTO.DossierRecoursResponse> getDossiersAvecMontantEleve(Double montantSeuil) {
-        log.debug("Récupération des dossiers avec montant > {}", montantSeuil);
         
         List<DossierRecours> dossiers = 
             dossierRecoursRepository.findDossiersAvecMontantEleve(montantSeuil);
@@ -347,11 +275,6 @@ public class DossierRecoursService {
                 .collect(Collectors.toList());
     }
 
-    // ============== Méthodes utilitaires ==============
-
-    /**
-     * Génère un numéro de dossier unique
-     */
     private String generateNumeroDossier() {
         String prefix = "REC";
         String timestamp = String.valueOf(System.currentTimeMillis());
@@ -359,9 +282,6 @@ public class DossierRecoursService {
         return prefix + "-" + timestamp.substring(timestamp.length() - 8) + "-" + random;
     }
 
-    /**
-     * Convertit les documents DTO en entités
-     */
     private List<DossierRecours.Document> convertDocuments(List<DossierRecoursDTO.DocumentDTO> dtos) {
         if (dtos == null || dtos.isEmpty()) {
             return new ArrayList<>();
@@ -380,9 +300,6 @@ public class DossierRecoursService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Convertit les documents entités en DTOs
-     */
     private List<DossierRecoursDTO.DocumentDTO> convertDocumentsToDTOs(
             List<DossierRecours.Document> documents) {
         
@@ -401,9 +318,6 @@ public class DossierRecoursService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Mappe une entité vers un DTO de réponse
-     */
     private DossierRecoursDTO.DossierRecoursResponse mapToResponse(DossierRecours dossier) {
         DossierRecoursDTO.DossierRecoursResponse response = new DossierRecoursDTO.DossierRecoursResponse();
         response.setId(dossier.getId());

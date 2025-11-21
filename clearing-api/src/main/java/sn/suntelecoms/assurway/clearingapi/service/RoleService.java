@@ -130,7 +130,7 @@ public class RoleService {
                 keycloakRoleService.createRole(authority, description);
             }
         } catch (Exception e) {
-            log.error("✗ Échec de synchronisation du rôle '{}' vers Keycloak: {}", 
+            log.error("Échec de synchronisation du rôle '{}' vers Keycloak: {}", 
                      authority, e.getMessage(), e);
         }
     }
@@ -143,7 +143,7 @@ public class RoleService {
                 log.debug("Le rôle '{}' n'existe pas dans Keycloak", authority);
             }
         } catch (Exception e) {
-            log.error("✗ Échec de suppression du rôle '{}' de Keycloak: {}", 
+            log.error("Échec de suppression du rôle '{}' de Keycloak: {}", 
                      authority, e.getMessage(), e);
         }
     }
