@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
@@ -61,8 +60,9 @@ public class DossierRecours {
         this.createdAt = LocalDateTime.now();
     }
 
-    @Embeddable
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Document {
         private String fileName;
         private String mimeType;

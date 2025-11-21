@@ -43,9 +43,7 @@ public class DataInitializer implements CommandLineRunner {
 
         assignAllPrivilegesToAdmin(adminRole);
 
-        createAdminUserIfNotExists(adminRole);
-
-        createAdminUserInKeycloakIfNotExists();
+        createAdminUserInKeycloakAndLocalDbIfNotExists(adminRole);
     }
 
     private Role createAdminRoleIfNotExists() {
@@ -62,13 +60,51 @@ public class DataInitializer implements CommandLineRunner {
         return adminRole;
     }
 
-    private void createAdminUserIfNotExists(Role adminRole) {
-        userRepository.findByEmail("admin@example.com").ifPresentOrElse(
+    private void createAdminUserInKeycloakAndLocalDbIfNotExists(Role adminRole) {
+        final String adminEmail = "admin@example.com";
+        final String adminUsername = adminEmail;
+
+        List<UserRepresentation> users = keycloakAdmin.realm(realm)
+                .users()
+                .search(adminEmail);
+
+        String keycloakId;
+
+        if (users.isEmpty()) {
+            UserRepresentation user = new UserRepresentation();
+            user.setUsername(adminUsername);
+            user.setEmail(adminEmail);
+            user.setFirstName("admin");
+            user.setLastName("admin");
+            user.setEnabled(true);
+
+            CredentialRepresentation password = new CredentialRepresentation();
+            password.setTemporary(false);
+            password.setType(CredentialRepresentation.PASSWORD);
+            password.setValue("Admin@123");
+
+            user.setCredentials(Collections.singletonList(password));
+
+            keycloakAdmin.realm(realm).users().create(user);
+            users = keycloakAdmin.realm(realm).users().search(adminEmail);
+            if(users.isEmpty()) {
+                log.error("Échec de la récupération de l'ID Keycloak après la création. La création de l'utilisateur local sera ignorée.");
+                return;
+            }
+            keycloakId = users.get(0).getId();
+
+        } else {
+            keycloakId = users.get(0).getId();
+            log.info("Utilisateur admin déjà présent dans Keycloak avec l'ID : {}", keycloakId);
+        }
+
+        final String finalKeycloakId = keycloakId;
+        userRepository.findByEmail(adminEmail).ifPresentOrElse(
                 user -> log.info("Utilisateur admin déjà présent dans la base locale"),
                 () -> {
                     User admin = new User();
-                    admin.setUsername("admin@example.com");
-                    admin.setEmail("admin@example.com");
+                    admin.setUsername(adminUsername);
+                    admin.setEmail(adminEmail);
                     admin.setFirstName("admin");
                     admin.setLastName("admin");
                     admin.setDisplayName("admin admin");
@@ -77,36 +113,12 @@ public class DataInitializer implements CommandLineRunner {
                     admin.setEnabled(true);
                     admin.setHasPasswordUpdate(false);
                     admin.setRoles(Set.of(adminRole));
+                    admin.setKeycloakId(finalKeycloakId);
 
                     userRepository.save(admin);
+                    log.info("Utilisateur admin créé dans la base locale avec keycloak_id : {}", finalKeycloakId);
                 }
         );
-    }
-
-    private void createAdminUserInKeycloakIfNotExists() {
-        List<UserRepresentation> users = keycloakAdmin.realm(realm)
-                .users()
-                .search("admin@example.com");
-
-        if (users.isEmpty()) {
-            UserRepresentation user = new UserRepresentation();
-            user.setUsername("admin@example.com");
-            user.setEmail("admin@example.com");
-            user.setFirstName("admin");
-            user.setLastName("admin");
-            user.setEnabled(true);
-
-            CredentialRepresentation password = new CredentialRepresentation();
-            password.setTemporary(false);
-            password.setType(CredentialRepresentation.PASSWORD);
-            password.setValue("P@sser123");
-
-            user.setCredentials(Collections.singletonList(password));
-
-            keycloakAdmin.realm(realm).users().create(user);
-        } else {
-            log.info("Utilisateur admin déjà présent dans Keycloak");
-        }
     }
 
     private void createPrivilegesIfNotExists() {
