@@ -5,7 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,15 +54,8 @@ public class UserService {
             throw new ResourceAlreadyExistsException("Utilisateur", "email", request.getEmail());
         }
 
-        String username = request.getEmail().split("@")[0];
-        int counter = 1;
-        String originalUsername = username;
-        while (userRepository.existsByUsername(username)) {
-            username = originalUsername + counter++;
-        }
-
         User user = new User();
-        user.setUsername(username);
+        user.setUsername(request.getEmail());
         user.setEmail(request.getEmail());
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -129,6 +126,101 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (auth == null || !auth.isAuthenticated()) {
+            log.error("Aucune authentification trouvée dans le contexte de sécurité");
+            throw new RuntimeException("Utilisateur non authentifié");
+        }
+
+        if (!(auth instanceof JwtAuthenticationToken jwtAuth)) {
+            log.error("Type d'authentification invalide: {}", auth.getClass().getName());
+            throw new RuntimeException("Type d'authentification invalide");
+        }
+
+        Jwt jwt = jwtAuth.getToken();
+
+        String username = jwt.getClaimAsString("preferred_username");
+        String email = jwt.getClaimAsString("email");
+        String firstName = jwt.getClaimAsString("given_name");
+        String lastName = jwt.getClaimAsString("family_name");
+        String sub = jwt.getClaimAsString("sub");
+        
+        if (username == null) {
+            log.error("Claim 'preferred_username' manquant dans le token JWT");
+            throw new RuntimeException("Claim 'preferred_username' manquant dans le token");
+        }
+
+        log.debug("Recherche de l'utilisateur: username={}, email={}", username, email);
+
+        return userRepository.findByUsername(username)
+                .orElseGet(() -> {
+                    log.info("Utilisateur '{}' introuvable en base, création automatique", username);
+                    return createUserFromJwt(username, email, firstName, lastName, sub);
+                });
+    }
+
+    @Transactional
+    protected User createUserFromJwt(String username, String email, 
+                                    String firstName, String lastName, String keycloakId) {
+        
+        log.info("Création automatique de l'utilisateur: username={}, email={}", username, email);
+        
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setEmail(email);
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
+        newUser.setKeycloakId(keycloakId);
+        newUser.setEnabled(true);
+        
+        User savedUser = userRepository.save(newUser);
+        
+        return savedUser;
+    }
+
+    @Transactional
+    public User getCurrentUserWithAssureur() {
+        User currentUser = getCurrentUser();
+        
+        if (currentUser.getAssureur() == null) {
+            throw new RuntimeException(
+                "Votre compte n'est pas encore lié à un assureur. " +
+                "Veuillez contacter l'administrateur pour finaliser votre profil. "+currentUser
+            );
+        }
+        
+        return currentUser;
+    }
+
+    public JwtUserInfo getJwtUserInfo() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (!(auth instanceof JwtAuthenticationToken jwtAuth)) {
+            throw new RuntimeException("Type d'authentification invalide");
+        }
+
+        Jwt jwt = jwtAuth.getToken();
+        
+        return JwtUserInfo.builder()
+                .username(jwt.getClaimAsString("preferred_username"))
+                .email(jwt.getClaimAsString("email"))
+                .firstName(jwt.getClaimAsString("given_name"))
+                .lastName(jwt.getClaimAsString("family_name"))
+                .keycloakId(jwt.getClaimAsString("sub"))
+                .build();
+    }
+    @lombok.Data
+    @lombok.Builder
+    public static class JwtUserInfo {
+        private String username;
+        private String email;
+        private String firstName;
+        private String lastName;
+        private String keycloakId;
+    }
 
     @Transactional
     public UserDTO.UserResponse updateUser(UUID id, UserDTO.UpdateUserRequest request) {

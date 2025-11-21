@@ -73,7 +73,8 @@ public class DossierRecoursDTO {
     @AllArgsConstructor
     public static class DossierRecoursResponse {
         private UUID id;
-        private UUID assureurDestinataireId;
+        private AssureurDTO.AssureurResponse assureurDestinataire;
+        private AssureurDTO.AssureurResponse assureurSource;
         private String numeroDossier;
         private String nomAssure;
         private String nomTiers;

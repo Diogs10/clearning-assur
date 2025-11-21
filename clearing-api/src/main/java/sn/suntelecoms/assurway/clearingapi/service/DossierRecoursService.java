@@ -8,10 +8,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import sn.suntelecoms.assurway.clearingapi.dto.AssureurDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.DossierRecoursDTO;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceAlreadyExistsException;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceNotFoundException;
+import sn.suntelecoms.assurway.clearingapi.model.Assureur;
 import sn.suntelecoms.assurway.clearingapi.model.DossierRecours;
+import sn.suntelecoms.assurway.clearingapi.model.User;
+import sn.suntelecoms.assurway.clearingapi.repository.AssureurRepository;
 import sn.suntelecoms.assurway.clearingapi.repository.DossierRecoursRepository;
 
 import java.time.LocalDateTime;
@@ -24,6 +29,8 @@ import java.util.stream.Collectors;
 public class DossierRecoursService {
 
     private final DossierRecoursRepository dossierRecoursRepository;
+    private final AssureurRepository assureurRepository;
+    private final UserService userService;
 
     /**
      * Crée un nouveau dossier de recours
@@ -44,8 +51,38 @@ public class DossierRecoursService {
             request.getNumeroDossier() : 
             generateNumeroDossier();
 
+        Assureur assureur = assureurRepository.findById(request.getAssureurDestinataireId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Assureur", "id", request.getAssureurDestinataireId()));
+
+        User currentUser;
+        Assureur assureurSource;
+        
+        try {
+            currentUser = userService.getCurrentUserWithAssureur();
+            assureurSource = currentUser.getAssureur();
+            
+            log.info("Utilisateur authentifié: username={}, assureur={}", 
+                     currentUser.getUsername(), 
+                     assureurSource.getId());
+            
+        } catch (RuntimeException e) {
+            log.error("Erreur lors de la récupération de l'utilisateur: {}", e.getMessage());
+            
+            throw new RuntimeException(
+                "Impossible de créer le dossier: " + e.getMessage() + 
+                " Veuillez contacter l'administrateur pour lier votre compte à un assureur."
+            );
+            
+            // Mode permissif (décommentez si besoin):
+            // currentUser = userService.getCurrentUser();
+            // assureurSource = null;
+            // log.warn("Création du dossier sans assureur source pour l'utilisateur: {}", 
+            //          currentUser.getUsername());
+        }
+
         DossierRecours dossier = DossierRecours.builder()
-                .assureurDestinataireId(request.getAssureurDestinataireId())
+                .assureurDestinataireId(assureur)
+                .assureurSourceId(assureurSource)
                 .commentaire(request.getCommentaire())
                 .dateSinistre(request.getDateSinistre())
                 .immatriculationAssure(request.getImmatriculationAssure())
@@ -264,7 +301,8 @@ public class DossierRecoursService {
     public Map<String, Object> getStatistiquesByAssureur(UUID assureurId) {
         log.debug("Calcul des statistiques pour l'assureur: {}", assureurId);
         
-        long count = dossierRecoursRepository.countByAssureurDestinataireId(assureurId);
+        Assureur assureur = assureurRepository.findById(assureurId).get();
+        long count = dossierRecoursRepository.countByAssureurDestinataireId(assureur);
         Double total = dossierRecoursRepository.sumMontantRecoursByAssureur(assureurId);
         
         Map<String, Object> stats = new HashMap<>();
@@ -369,7 +407,24 @@ public class DossierRecoursService {
     private DossierRecoursDTO.DossierRecoursResponse mapToResponse(DossierRecours dossier) {
         DossierRecoursDTO.DossierRecoursResponse response = new DossierRecoursDTO.DossierRecoursResponse();
         response.setId(dossier.getId());
-        response.setAssureurDestinataireId(dossier.getAssureurDestinataireId());
+        response.setAssureurDestinataire( new AssureurDTO.AssureurResponse(
+            dossier.getAssureurDestinataireId().getId(), 
+            dossier.getAssureurDestinataireId().getNom(),
+            dossier.getAssureurDestinataireId().getAdresse(), 
+            dossier.getAssureurDestinataireId().getTelephone(),
+            dossier.getAssureurDestinataireId().getEmail(),
+            dossier.getAssureurDestinataireId().getLogo(),
+            dossier.getAssureurDestinataireId().getCreatedAt()
+        ));
+        response.setAssureurSource( new AssureurDTO.AssureurResponse(
+            dossier.getAssureurSourceId().getId(),
+            dossier.getAssureurSourceId().getNom(),
+            dossier.getAssureurSourceId().getAdresse(),
+            dossier.getAssureurSourceId().getTelephone(),
+            dossier.getAssureurSourceId().getEmail(),
+            dossier.getAssureurSourceId().getLogo(),
+            dossier.getAssureurSourceId().getCreatedAt()
+        ));
         response.setNumeroDossier(dossier.getNumeroDossier());
         response.setNomAssure(dossier.getNomAssure());
         response.setNomTiers(dossier.getNomTiers());

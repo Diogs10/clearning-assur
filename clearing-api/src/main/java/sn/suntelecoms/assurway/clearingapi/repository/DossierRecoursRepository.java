@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import sn.suntelecoms.assurway.clearingapi.model.Assureur;
 import sn.suntelecoms.assurway.clearingapi.model.DossierRecours;
 
 import java.time.LocalDateTime;
@@ -71,7 +73,7 @@ public interface DossierRecoursRepository extends JpaRepository<DossierRecours, 
             Pageable pageable
     );
 
-    long countByAssureurDestinataireId(UUID assureurDestinataireId);
+    long countByAssureurDestinataireId(Assureur assureurDestinataire);
 
     @Query("SELECT SUM(d.montantRecours) FROM DossierRecours d WHERE d.assureurDestinataireId = :assureurId")
     Double sumMontantRecoursByAssureur(@Param("assureurId") UUID assureurId);

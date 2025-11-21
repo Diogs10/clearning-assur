@@ -22,7 +22,13 @@ public class DossierRecours {
     @GeneratedValue
     private UUID id;
 
-    private UUID assureurDestinataireId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assureur_destinataire_id")
+    private Assureur assureurDestinataireId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assureur_source_id")
+    private Assureur assureurSourceId;
 
     private String commentaire;
 
