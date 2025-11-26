@@ -11,15 +11,15 @@ public class ApiResponse<T> {
     private boolean success;
     private String message;
     private T data;
-    private int statusCode;
+    private int responseCode;
     private String status;
     private LocalDateTime timestamp;
 
-    private ApiResponse(boolean success, String message, T data, int statusCode, String status) {
+    private ApiResponse(boolean success, String message, T data, int responseCode, String status) {
         this.success = success;
         this.message = message;
         this.data = data;
-        this.statusCode = statusCode;
+        this.responseCode = responseCode;
         this.status = status;
         this.timestamp = LocalDateTime.now();
     }
@@ -61,8 +61,8 @@ public class ApiResponse<T> {
     public T getData() { return data; }
     public void setData(T data) { this.data = data; }
 
-    public int getStatusCode() { return statusCode; }
-    public void setStatusCode(int statusCode) { this.statusCode = statusCode; }
+    public int getresponseCode() { return responseCode; }
+    public void setresponseCode(int responseCode) { this.responseCode = responseCode; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

@@ -11,18 +11,18 @@ public class ApiErrorResponse {
 
     private boolean success;
     private String message;
-    private int statusCode;
+    private int responseCode;
     private String status;
     private String error;
     private List<String> details;
     private String path;
     private LocalDateTime timestamp;
 
-    private ApiErrorResponse(boolean success, String message, int statusCode, String status,
+    private ApiErrorResponse(boolean success, String message, int responseCode, String status,
                              String error, List<String> details, String path) {
         this.success = success;
         this.message = message;
-        this.statusCode = statusCode;
+        this.responseCode = responseCode;
         this.status = status;
         this.error = error;
         this.details = details;
@@ -97,8 +97,8 @@ public class ApiErrorResponse {
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
 
-    public int getStatusCode() { return statusCode; }
-    public void setStatusCode(int statusCode) { this.statusCode = statusCode; }
+    public int getresponseCode() { return responseCode; }
+    public void setresponseCode(int responseCode) { this.responseCode = responseCode; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
