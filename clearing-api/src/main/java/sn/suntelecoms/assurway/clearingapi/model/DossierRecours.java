@@ -2,6 +2,7 @@ package sn.suntelecoms.assurway.clearingapi.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import sn.suntelecoms.assurway.clearingapi.constantes.StatutDossierRecours;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -54,6 +55,10 @@ public class DossierRecours {
     private String numeroDossier;
 
     private String responsabiliteEnOeuvre;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private StatutDossierRecours statut = StatutDossierRecours.ENVOYE;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")

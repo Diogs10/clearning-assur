@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import sn.suntelecoms.assurway.clearingapi.constantes.StatutDossierRecours;
 import sn.suntelecoms.assurway.clearingapi.dto.AssureurDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.DossierRecoursDTO;
 import sn.suntelecoms.assurway.clearingapi.exception.ResourceAlreadyExistsException;
@@ -31,6 +32,7 @@ public class DossierRecoursService {
     private final DossierRecoursRepository dossierRecoursRepository;
     private final AssureurRepository assureurRepository;
     private final UserService userService;
+    private final SuiviDossierService suiviDossierService;
 
     @Transactional
     public DossierRecoursDTO.DossierRecoursResponse createDossier(DossierRecoursDTO.DossierRecoursCreateRequest request) {
@@ -95,6 +97,28 @@ public class DossierRecoursService {
                 .orElseThrow(() -> new ResourceNotFoundException("Dossier de recours", "id", id));
         
         return mapToResponse(dossier);
+    }
+
+    @Transactional
+    public DossierRecoursDTO.DossierRecoursResponse updateDossierStatus(
+            UUID dossierId, StatutDossierRecours newStatut, String motif) {
+
+        DossierRecours dossier = dossierRecoursRepository.findById(dossierId)
+            .orElseThrow(() -> new ResourceNotFoundException("Dossier de recours", "id", dossierId));
+        
+        if (StatutDossierRecours.from(dossier.getStatut().getValue())) {
+            if (!dossier.getStatut().equals(newStatut)) {
+                dossier.setStatut(newStatut);
+            }
+        } else {
+            throw new IllegalArgumentException("Statut invalide: " + dossier.getStatut().getValue());
+        }
+        
+        DossierRecours updatedDossier = dossierRecoursRepository.save(dossier);
+
+        suiviDossierService.logStatusChange(dossierId, newStatut, motif); 
+
+        return mapToResponse(updatedDossier);
     }
 
     public DossierRecoursDTO.DossierRecoursResponse getDossierByNumero(String numeroDossier) {
@@ -350,6 +374,7 @@ public class DossierRecoursService {
         response.setResponsabiliteEnOeuvre(dossier.getResponsabiliteEnOeuvre());
         response.setDocuments(convertDocumentsToDTOs(dossier.getDocuments()));
         response.setCreatedAt(dossier.getCreatedAt());
+        response.setStatut(dossier.getStatut());
         return response;
     }
 }

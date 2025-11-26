@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import sn.suntelecoms.assurway.clearingapi.constantes.StatutDossierRecours;
 import sn.suntelecoms.assurway.clearingapi.dto.ApiResponse;
 import sn.suntelecoms.assurway.clearingapi.dto.DossierRecoursDTO;
 import sn.suntelecoms.assurway.clearingapi.dto.PaginatedResponse;
@@ -54,6 +55,20 @@ public class DossierRecoursController {
         DossierRecoursDTO.DossierRecoursResponse response = dossierRecoursService.getDossierById(id);
         
         return ResponseUtil.success(response);
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'UNDERWRITER')")
+    @Operation(summary = "Mettre à jour le statut d'un dossier",
+            description = "Change le statut du dossier de recours et enregistre le motif")
+    public ResponseEntity<ApiResponse<DossierRecoursDTO.DossierRecoursResponse>> updateDossierStatus(
+            @PathVariable UUID id,
+            @RequestParam StatutDossierRecours statut,
+            @RequestParam(required = false) String motif) {
+
+        DossierRecoursDTO.DossierRecoursResponse response =  dossierRecoursService.updateDossierStatus(id, statut, motif);
+
+        return ResponseUtil.success(response, "Statut du dossier mis à jour avec succès");
     }
 
     @GetMapping("/numero/{numeroDossier}")

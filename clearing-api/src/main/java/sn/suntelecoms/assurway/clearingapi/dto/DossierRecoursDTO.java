@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import sn.suntelecoms.assurway.clearingapi.constantes.StatutDossierRecours;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -86,5 +87,6 @@ public class DossierRecoursDTO {
         private String responsabiliteEnOeuvre;
         private List<DocumentDTO> documents;
         private LocalDateTime createdAt;
+        private StatutDossierRecours statut;
     }
 }
